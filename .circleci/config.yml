@@ -47,7 +47,7 @@ jobs:
 
             # add generated files
             git add .
-            git commit -m "publish $CIRCLE_SHA1 [ci skip]"
+            git commit -m "Publish (`date -u '+%F %T %Z'`) [ci skip]"
 
             # push to pages branch
             git remote add origin "$CIRCLE_REPOSITORY_URL"
