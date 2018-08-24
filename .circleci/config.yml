@@ -50,7 +50,7 @@ jobs:
             git commit -m "Publish (`date -u '+%F %T %Z'`) [ci skip]"
 
             # push to pages branch
-            git remote add origin "$CIRCLE_REPOSITORY_URL"
+            git remote add origin git@github.com:whistlepayer/whistlepayer.github.io
             git push --force origin master
 
 workflows:
