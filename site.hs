@@ -1,5 +1,3 @@
---------------------------------------------------------------------------------
-
 {-# LANGUAGE OverloadedStrings #-}
 
 import Hakyll
@@ -23,35 +21,25 @@ main = hakyll $ do
       >>= relativizeUrls
 
   match "posts/*" $ do
-    route $ setExtension "html"
+    route   $ setExtension "html"
     compile $ pandocCompiler
       >>= loadAndApplyTemplate "templates/post.html"    postCtx
       >>= loadAndApplyTemplate "templates/default.html" postCtx
       >>= relativizeUrls
 
   create ["archive.html"] $ do
-    route idRoute
+    route   idRoute
     compile $ do
-      posts <- recentFirst =<< loadAll "posts/*"
-      let archiveCtx =
-            listField "posts" postCtx (return posts) <>
-            constField "title" "Archives"            <>
-            defaultContext
-
+      let archiveCtx = listCtx "Archives"
       makeItem ""
         >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
         >>= loadAndApplyTemplate "templates/default.html" archiveCtx
         >>= relativizeUrls
 
   match "index.html" $ do
-    route idRoute
+    route   idRoute
     compile $ do
-      posts <- recentFirst =<< loadAll "posts/*"
-      let indexCtx =
-            listField "posts" postCtx (return posts) <>
-            constField "title" "Home"                <>
-            defaultContext
-
+      let indexCtx = listCtx "Home"
       getResourceBody
         >>= applyAsTemplate indexCtx
         >>= loadAndApplyTemplate "templates/default.html" indexCtx
@@ -63,5 +51,11 @@ main = hakyll $ do
 
 postCtx :: Context String
 postCtx =
-    dateField "date" "%B %e, %Y" `mappend`
-    defaultContext
+     dateField "date" "%B %e, %Y"
+  <> defaultContext
+
+listCtx :: String -> Context String
+listCtx title =
+     listField "posts" postCtx (recentFirst =<< loadAll "posts/*")
+  <> constField "title" title
+  <> defaultContext
