@@ -28,9 +28,6 @@ Original:
 https://github.com/katychuang/hakyll-cssgarden/blob/6a06542a1644845a615c03e86407b2251279f675/default_theme/css/fifthave.css
 */
 
-
-@import url('https://code.cdn.mozilla.net/fonts/fira.css');
-
 body {
     background-color: rgb(248, 249, 250);
     color: #000;
