@@ -33,9 +33,9 @@ body {
     color: #000;
     font-family: 'Fira Sans', sans-serif;
     font-size: 16px;
-    margin: 0 auto;
+    margin: auto;
     max-width: 800px;
-    padding: 20px 20px 0 20px;
+    padding: 0px 20px 0 20px;
 }
 
 /* Why? */
@@ -47,8 +47,7 @@ a {
 #header {
     border-bottom: 2px solid #1A9485;
     margin-bottom: 30px;
-    padding: 1em 0px 12px 0px;
-    z-index: 999;
+    padding: 12px 0px 6px 0px;
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -56,6 +55,7 @@ a {
 
 #logo {
     flex: 0 0 auto;
+    padding-left: 6px;
 }
 
 #logo a {
@@ -68,7 +68,8 @@ a {
 }
 
 #navigation {
-    margin-top: 20px;
+    margin-top: 6px;
+    padding-right:6px;
     text-align: right;
     flex: 1 1 auto;
 }
@@ -84,8 +85,7 @@ a {
 }
 
 #navigation a:hover {
-    background:#113;
-    color: white;
+    color: #F97C59;
     text-decoration: none;
 }
 
@@ -93,7 +93,7 @@ a {
     background: #343434;
     color: #EEE;
     font-size: 12px;
-    padding: 10px 0px 10px 0px;
+    padding: 8px 0px 8px 0px;
     text-align: center;
     position: fixed;
     bottom: 0;
@@ -123,7 +123,7 @@ section.header {
 
 #content {
     background: white;
-    margin-bottom: 70px;
+    margin-bottom: 50px;
     width: 100%;
     padding: 10px 0px 50px 0px;
 }
@@ -144,14 +144,14 @@ section.header {
 #content h1, #content h2, #content h3, #content h4, #content h5,
 #content ol, #content ul, #content p, #content blockquote {
     margin: auto auto auto auto;
-    padding: 0 40px 0 40px;
+    padding: 0 35px 0 35px;
     line-height: 1.5em;
     margin-top: 1em;
 }
 
 #content h1, #content h2, #content h3, #content h4, #content h5,
 #content ol, #content ul {
-    margin-top: 1em;
+    margin-top: 0.5em;
     line-height: 2em;
 }
 
