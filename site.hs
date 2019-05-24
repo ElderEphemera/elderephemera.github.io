@@ -47,6 +47,10 @@ main = hakyll $ do
 
   match "templates/*" $ compile templateBodyCompiler
 
+  match "four/*" $ do
+    route   idRoute
+    compile copyFileCompiler
+
 --------------------------------------------------------------------------------
 
 postCtx :: Context String
