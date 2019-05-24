@@ -1,15 +1,16 @@
--- This file has been generated from package.yaml by hpack version 0.20.0.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a622bd425469452685458424634a3a7fda847865a64acf930b5cec1efaa966df
+-- hash: d8ba4f55d8a13cdf1a6fb4bceb7857234df9f1713c8ba618490425e76b004952
 
 name:           whistlepayer-github-io
 version:        0.1.0.0
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
-cabal-version:  >= 1.10
 
 executable site
   main-is: site.hs
