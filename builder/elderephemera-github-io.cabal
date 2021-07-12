@@ -1,0 +1,14 @@
+cabal-version: 1.12
+
+name:           elderephemera-github-io
+version:        0.1.0.0
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+
+executable build-site
+  main-is: build-site.hs
+  build-depends:
+    base >= 4.14.1 && < 4.15,
+    hakyll >= 4.14.0 && < 4.15
+  default-language: Haskell2010
