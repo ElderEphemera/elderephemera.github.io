@@ -12,3 +12,4 @@ executable build-site
     base >= 4.14.1 && < 4.15,
     hakyll >= 4.14.0 && < 4.15
   default-language: Haskell2010
+  ghc-options: -Wall
