@@ -12,6 +12,7 @@ in
 
 let
   builder = import ./builder { inherit pkgs; };
+  projects = import ./projects { inherit pkgs; };
 
   site = pkgs.stdenv.mkDerivation {
     name = "elderephemera.github.io";
@@ -21,14 +22,16 @@ let
       ".gitmodules"
       ".circleci"
       "builder"
+      "projects"
       "result"
     ] ./.;
-    buildInputs = [ builder ];
+    buildInputs = [ builder projects ];
 
     LOCALE_ARCHIVE = "${pkgs.glibcLocales}/lib/locale/locale-archive";
     LC_ALL = "C.UTF-8";
 
     buildPhase = ''
+      cp -r ${projects} projects
       ${builder}/bin/build-site build
     '';
     installPhase = ''

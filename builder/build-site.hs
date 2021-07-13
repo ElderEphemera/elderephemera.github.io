@@ -47,7 +47,7 @@ main = hakyll $ do
 
   match "templates/*" $ compile templateBodyCompiler
 
-  match "four/*" $ do
+  match "projects/**" $ do
     route   idRoute
     compile copyFileCompiler
 
