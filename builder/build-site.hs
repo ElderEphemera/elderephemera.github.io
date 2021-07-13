@@ -2,6 +2,8 @@
 
 import Hakyll
 
+import Style (style)
+
 --------------------------------------------------------------------------------
 
 main :: IO ()
@@ -10,9 +12,9 @@ main = hakyll $ do
     route   idRoute
     compile copyFileCompiler
 
-  match "css/*" $ do
+  create ["css/style.css"] $ do
     route   idRoute
-    compile compressCssCompiler
+    compile $ makeItem style
 
   match (fromList ["about.rst", "contact.markdown"]) $ do
     route   $ setExtension "html"
