@@ -1,13 +1,13 @@
 cabal-version: 1.12
 
-name:           elderephemera-github-io
+name:           build-site
 version:        0.1.0.0
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 
 executable build-site
-  main-is: build-site.hs
+  main-is: Main.hs
   other-modules: Style
   build-depends:
     base >= 4.14.1 && < 4.15,

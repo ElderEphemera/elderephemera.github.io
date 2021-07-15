@@ -1,3 +1,5 @@
+module Main (main) where
+
 import Hakyll
 
 import Style (style)
