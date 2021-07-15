@@ -47,6 +47,4 @@ let
     '';
   };
 
-in
-if pkgs.lib.inNixShell then builder
-else { inherit builder site; }
+in { inherit builder site; }
