@@ -1,9 +1,8 @@
 let
-  pinnedPkgs = import (builtins.fetchGit {
+  pinnedPkgs = import (builtins.fetchTarball {
     name = "nixos-unstable-2021-07-12";
-    url = "https://github.com/nixos/nixpkgs/";
-    ref = "refs/heads/nixos-unstable";
-    rev = "45fc7d4a35c5343e58541a7847f6415654ccbb37";
+    url = "https://github.com/nixos/nixpkgs/archive/45fc7d4a35c.tar.gz";
+    sha256 = "1z2afrpdpyk9p120xc9vx79xz61lviz2csalzvikypq85drs1hgd";
   }) {};
 in
 
