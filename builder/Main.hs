@@ -55,6 +55,19 @@ main = hakyll $ do
 
   match "templates/*" $ compile templateBodyCompiler
 
+  match "projects.html" $ do
+    route   idRoute
+    compile $ do
+      let projectContext = field "url" (pure . toFilePath . itemIdentifier)
+          projects = loadAll "projects/*/index.html" :: Compiler [Item CopyFile]
+          projectsContext =
+               listField "projects" projectContext projects
+            <> defaultContext
+      getResourceBody
+        >>= applyAsTemplate projectsContext
+        >>= loadAndApplyTemplate "templates/default.html" projectsContext
+        >>= relativizeUrls
+
   match "projects/**" $ do
     route   idRoute
     compile copyFileCompiler
