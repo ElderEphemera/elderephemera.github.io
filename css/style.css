@@ -1,0 +1,116 @@
+
+body
+{
+  max-width        : 900px;
+  margin           : auto auto auto auto;
+  color            : #faede8;
+  background-color : #041816;
+  font-family      : "Fira Sans", sans-serif;
+  font-size        : 12pt;
+}
+
+a,
+a:visited
+{
+  color           : #f94c39;
+  text-decoration : none;
+}
+
+a:hover,
+a:focus
+{
+  color : #a83614;
+}
+
+
+#header a,
+#footer a
+{
+  color : #c92c29;
+}
+
+
+#navigation a:hover,
+#footer a:hover
+{
+  color : #96161b;
+}
+
+#header
+{
+  padding         : 12px 10px 3px 10px;
+  margin          : 0px 10px 0px 10px;
+  border-bottom   : solid 2px #c92c29;
+  display         : flex;
+  flex-wrap       : wrap;
+  justify-content : space-between;
+  font-weight     : bold;
+}
+
+#logo
+{
+  flex      : 1 1 auto;
+  font-size : 20pt;
+}
+
+#navigation
+{
+  flex           : 1 1 auto;
+  text-align     : right;
+  align-self     : flex-end;
+  text-transform : uppercase;
+}
+
+#content
+{
+  background-color : #071410;
+  padding          : 5px 20px 5px 20px;
+  margin           : 20px 15px 0px 15px;
+  border-radius    : 20px 20px 20px 20px;
+}
+
+#postlist
+{
+  list-style-type : none;
+  padding         : 0px 8px 0px 8px;
+}
+
+#postlist li
+{
+  border-top      : solid 1px #faede8;
+  padding         : 10px 10px 10px 10px;
+  display         : flex;
+  flex-wrap       : wrap;
+  justify-content : space-between;
+}
+
+#postlist li:last-child
+{
+  border-bottom : solid 1px #faede8;
+}
+
+#postlist li a
+{
+  flex : 1 1 auto;
+}
+
+#postlist li span
+{
+  color      : #756e63;
+  flex       : 0 0 auto;
+  text-align : right;
+}
+
+#footer
+{
+  background-color : #202a28;
+  font-size        : 10pt;
+  border-radius    : 20px 20px 20px 20px;
+  width            : 240px;
+  padding          : 5px 0px 5px 0px;
+  margin           : 10px auto 10px auto;
+  text-align       : center;
+}
+
+
+/* Generated with Clay, http://fvisser.nl/clay */
