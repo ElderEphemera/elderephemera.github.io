@@ -47,4 +47,4 @@ let
     '';
   };
 
-in { inherit builder site; }
+in { inherit builder projects site; }
