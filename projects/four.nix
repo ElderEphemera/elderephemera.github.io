@@ -4,7 +4,7 @@
 (import (pkgs.fetchFromGitHub {
   owner = "elderephemera";
   repo = "four";
-  rev = "56db0912a79f59d3e04636b02930cecaae73fa91";
-  sha256 = "176wdi22jpjlxqikjqkalaw4blv59wd0waq5mfbqg68l8z1lcgg2";
+  rev = "9513a6337a9aef90d5f7f61f3cccd62b163f0668";
+  sha256 = "16abk4bnfx2p9fxy3vpkzn5wd3rzlxvmjkcr0xabra48fnhsp78h";
   fetchSubmodules = true;
 })).build.web
