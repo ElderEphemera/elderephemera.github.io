@@ -73,6 +73,19 @@ css = do
         F.flex 0 0 auto
         textAlign $ alignSide sideRight
 
+  "#projectlist" ? do
+    listStyleType none
+    margin (px 0) (px 0) (px 0) (px 0)
+    padding (px 0) (px 10) (px 25) (px 10)
+
+    "li" ? do
+      backgroundColor "#202522"
+      borderRadius (px 15) (px 15) (px 15) (px 15)
+      padding (px 5) (px 23) (px 5) (px 23)
+      marginTop (px 20)
+
+      "h2" # ".project-name" ? marginBottom (px 0)
+
   "#footer" ? do
     backgroundColor "#202A28"
     fontSize $ pt 10

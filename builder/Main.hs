@@ -1,4 +1,8 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Main (main) where
+
+import System.FilePath (dropFileName)
 
 import Hakyll
 
@@ -58,8 +62,10 @@ main = hakyll $ do
   match "projects.html" $ do
     route   idRoute
     compile $ do
-      let projectContext = field "url" (pure . toFilePath . itemIdentifier)
-          projects = loadAll "projects/*/index.html" :: Compiler [Item CopyFile]
+      let projects = loadAll @String "projects/*/info.md"
+          projectContext =
+               mapContext dropFileName (pathField "dir")
+            <> defaultContext
           projectsContext =
                listField "projects" projectContext projects
             <> defaultContext
@@ -68,8 +74,10 @@ main = hakyll $ do
         >>= loadAndApplyTemplate "templates/default.html" projectsContext
         >>= relativizeUrls
 
-  match "projects/**" $ do
-    route   idRoute
+  match "projects/*/info.md" $ compile pandocCompiler
+
+  match "projects/*/content/**" $ do
+    route   $ gsubRoute "content/" mempty
     compile copyFileCompiler
 
 --------------------------------------------------------------------------------

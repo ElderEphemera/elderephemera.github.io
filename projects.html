@@ -11,7 +11,8 @@ title: Projects
 <ul id="projectlist">
   $for(projects)$
     <li>
-      <a href="/$url$">$url$</a>
+      <h2 class="project-name"><a href="$dir$">$name$</a></h2>
+      <p class="project-description">$body$</p>
     </li>
   $endfor$
 </ul>
