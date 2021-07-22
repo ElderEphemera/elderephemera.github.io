@@ -55,7 +55,6 @@ main = hakyll $ do
     route   idRoute
     compile $ getResourceBody
       >>= loadAndApplyTemplate "templates/default.html" defaultContext
-      >>= relativizeUrls
 
   match "templates/*" $ compile templateBodyCompiler
 
