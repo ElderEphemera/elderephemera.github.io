@@ -13,13 +13,13 @@ in {
   name = "four";
   path = (import repo).build.web;
   info = {
-    metadata = {
-      name = "Four";
-    };
+    title = "Four";
+    link = "four/index.html";
     description = ''
       Something approaching a 2048-esque puzzle game. But it doesn't quite
       achieve the "puzzle" or even the "game" part. Originally created for the
-      [Not A Game Jam Game Jam](https://itch.io/jam/not-a-game-jam-game-jam).
+      <a href="https://itch.io/jam/not-a-game-jam-game-jam">Not A Game Jam Game
+      Jam</a>.
     '';
   };
 }

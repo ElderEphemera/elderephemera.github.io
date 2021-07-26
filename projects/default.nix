@@ -5,13 +5,7 @@ let
   projectNames = [ "four" ];
   importProject = name: import (./. + "/${name}.nix") { inherit pkgs; };
 
-  infoFile = { metadata, description }: pkgs.writeText "info.md" ''
-    ---
-    ${pkgs.lib.concatStringsSep "\n" (pkgs.lib.mapAttrsToList
-      (name: val: "${name}: ${val}") metadata)}
-    ---
-    ${description}
-  '';
+  infoFile = info: pkgs.writeText "info.json" (builtins.toJSON info);
 
   projects = map (name:
     let project = importProject name;
@@ -19,7 +13,7 @@ let
       inherit (project) name;
       path = pkgs.linkFarm
         "elderephemera.github.io/projects/${project.name}" [
-          { name = "info.md"; path = infoFile project.info; }
+          { name = "info.json"; path = infoFile project.info; }
           { name = "content"; path = project.path; }
         ];
     }) projectNames;
