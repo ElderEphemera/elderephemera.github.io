@@ -21,5 +21,17 @@ in {
       <a href="https://itch.io/jam/not-a-game-jam-game-jam">Not A Game Jam Game
       Jam</a>.
     '';
+    badges = [
+      {
+        name = "GitHub";
+        link = "https://github.com/ElderEphemera/four";
+        image = "GitHub-Mark-Light-32px.png";
+      }
+      {
+        name = "itch.io";
+        link = "https://elderephemera.itch.io/four";
+        image = "itchio-textless-white.svg";
+      }
+    ];
   };
 }

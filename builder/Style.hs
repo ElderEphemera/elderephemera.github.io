@@ -76,15 +76,34 @@ css = do
   "#projectlist" ? do
     listStyleType none
     margin (px 0) (px 0) (px 0) (px 0)
-    padding (px 0) (px 10) (px 25) (px 10)
+    padding (px 0) (px 10) (px 15) (px 10)
 
     "li" ? do
       backgroundColor "#202522"
       borderRadius (px 15) (px 15) (px 15) (px 15)
-      padding (px 5) (px 23) (px 5) (px 23)
       marginTop (px 20)
 
-      "h2" # ".project-name" ? marginBottom (px 0)
+      ".project-header" ? do
+        display flex
+        flexWrap F.wrap
+        justifyContent spaceBetween
+        backgroundColor "#27322D"
+        padding (px 0) (px 13) (px 15) (px 23)
+        borderRadius (px 15) (px 15) (px 0) (px 0)
+
+        ".project-name" ? do
+          margin (px 20) (px 0) (px 0) (px 0)
+          F.flex 1 1 auto
+          fontSize $ px 30
+
+        ".project-badges" ? do
+          F.flex 1 1 auto
+          textAlign $ alignSide sideRight
+          alignSelf flexEnd
+
+          "a" ? paddingRight (px 8)
+
+      ".project-description" ? padding (px 6) (px 23) (px 18) (px 23)
 
   "#footer" ? do
     backgroundColor "#202A28"
