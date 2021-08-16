@@ -2,7 +2,7 @@
 
 module Main (main) where
 
-import Data.Aeson (Value(..), eitherDecode)
+import Data.Aeson (Value(..), eitherDecode, (.=))
 import Data.HashMap.Strict ((!?))
 import Data.Text (pack, unpack)
 import GHC.Exts (toList)
@@ -94,10 +94,14 @@ jsonCtx = Context $ \name args (Item _ meta) ->
     else pure EmptyField
   where
     getField (Object obj) (n:ns) | Just val <- obj !? pack n = getField val ns
+    getField (Object obj) [] = ListField jsonCtx
+      <$> traverse (makeItem . uncurry object) (toList obj)
     getField (String txt) [] = pure . StringField $ unpack txt
     getField (Array arr) [] = ListField jsonCtx
       <$> traverse makeItem (toList arr)
     getField _ _ = pure EmptyField
+
+    object key value = Object $ "key" .= key <> "value" .= value 
 
     splitName ('.':cs) = "" : splitName cs
     splitName (c:cs) = let n:ns = splitName cs in (c:n):ns
