@@ -83,7 +83,7 @@ postCtx =
 
 listCtx :: String -> Context String
 listCtx title =
-     listField "posts" postCtx (recentFirst =<< loadAll "posts/*")
+     listField "posts" postCtx (recentFirst =<< loadAll "posts/**")
   <> constField "title" title
   <> defaultContext
 
