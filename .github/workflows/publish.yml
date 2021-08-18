@@ -21,7 +21,7 @@ jobs:
 
     - name: Build
       run: |
-        nix-build -A site
+        make site
         cp -r $(readlink result) site
 
     - name: Deploy
