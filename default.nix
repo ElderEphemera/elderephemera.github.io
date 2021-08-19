@@ -1,5 +1,6 @@
 { pkgs ? import nix/pinned-nixpkgs.nix
 , checkLinks ? true
+, checkNoDrafts ? true
 }:
 
 let
@@ -24,7 +25,9 @@ let
     LOCALE_ARCHIVE = "${pkgs.glibcLocales}/lib/locale/locale-archive";
     LC_ALL = "C.UTF-8";
 
-    preInstallPhases = optional checkLinks "checkLinkPhase";
+    preInstallPhases =
+      optional checkLinks "checkLinkPhase" ++
+      optional checkNoDrafts "checkNoDraftsPhase";
 
     buildPhase = ''
       cp -r ${projects} projects
@@ -32,6 +35,11 @@ let
     '';
     checkLinkPhase = ''
       linkchecker _site
+    '';
+    checkNoDraftsPhase = ''
+      test -d _site/posts/drafts &&
+        echo "Error: posts/drafts detected in output" >&2 &&
+        exit 1
     '';
     installPhase = ''
       cp -r _site $out

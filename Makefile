@@ -1,4 +1,7 @@
 site:
 	nix-build -A site
 
-.PHONY: site
+test:
+	nix-build -A site --arg checkNoDrafts false
+
+.PHONY: site test
