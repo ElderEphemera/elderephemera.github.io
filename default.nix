@@ -1,6 +1,7 @@
 { pkgs ? import nix/pinned-nixpkgs.nix
-, checkLinks ? true
-, checkNoDrafts ? true
+, checkAll ? true
+, checkLinks ? checkAll
+, checkNoDrafts ? checkAll
 }:
 
 let

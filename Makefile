@@ -2,6 +2,6 @@ site:
 	nix-build -A site
 
 test:
-	nix-build -A site --arg checkNoDrafts false
+	nix-build -A site --arg checkAll false
 
 .PHONY: site test
