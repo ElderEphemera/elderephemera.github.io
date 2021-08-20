@@ -38,9 +38,8 @@ let
       linkchecker _site
     '';
     checkNoDraftsPhase = ''
-      test -d _site/posts/drafts &&
-        echo "Error: posts/drafts detected in output" >&2 &&
-        exit 1
+      test ! -d _site/posts/drafts ||
+        (echo "Error: posts/drafts detected in output" >&2 && exit 1)
     '';
     installPhase = ''
       cp -r _site $out
