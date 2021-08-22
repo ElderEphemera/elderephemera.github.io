@@ -27,14 +27,14 @@ let
     LC_ALL = "C.UTF-8";
 
     preInstallPhases =
-      optional checkLinks "checkLinkPhase" ++
+      optional checkLinks "checkLinksPhase" ++
       optional checkNoDrafts "checkNoDraftsPhase";
 
     buildPhase = ''
       cp -r ${projects} projects
       ${builder}/bin/build-site build
     '';
-    checkLinkPhase = ''
+    checkLinksPhase = ''
       linkchecker _site
     '';
     checkNoDraftsPhase = ''
