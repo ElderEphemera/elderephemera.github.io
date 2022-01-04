@@ -2,7 +2,7 @@
 }:
 
 let
-  projectNames = [ "four" ];
+  projectNames = [ "recipe-bookmarks" "four" ];
   importProject = name: import (./. + "/${name}.nix") { inherit pkgs; };
 
   infoFile = info: pkgs.writeText "info.json" (builtins.toJSON info);
