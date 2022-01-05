@@ -5,9 +5,8 @@ let
   repo = pkgs.fetchFromGitHub {
     owner = "elderephemera";
     repo = "four";
-    rev = "dd8098c02657dfc8bb1989335388f406ee2cd6fa";
-    sha256 = "060pszwya7xx58dar5b0df0k2hngqp7y7pq24v31r1qndmzn9qjr";
-    fetchSubmodules = true;
+    rev = "e11c35df3a84c0c7fee288e7ef6ca174f4a84dbb";
+    sha256 = "0did54cf6skvwspkcpisah6lh44yvywhccf6146kdm9q397pnz3h";
   };
 in {
   name = "four";
