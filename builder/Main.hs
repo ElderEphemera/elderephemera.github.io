@@ -6,6 +6,7 @@ import Data.Aeson (Value(..), eitherDecode, (.=))
 import Data.HashMap.Strict ((!?))
 import Data.Text (pack, unpack)
 import GHC.Exts (toList)
+import System.FilePath (dropExtension, (</>))
 
 import Hakyll
 
@@ -24,14 +25,14 @@ main = hakyll $ do
     compile $ makeItem style
 
   match "posts/**" $ do
-    route   $ setExtension "html"
+    route   cleanRoute
     compile $ pandocCompiler
       >>= loadAndApplyTemplate "templates/post.html"    postCtx
       >>= loadAndApplyTemplate "templates/default.html" postCtx
       >>= relativizeUrls
 
   create ["archive.html"] $ do
-    route   idRoute
+    route   cleanRoute
     compile $ do
       let archiveCtx = listCtx "Archives"
       makeItem ""
@@ -73,6 +74,11 @@ main = hakyll $ do
   match "projects/*/content/**" $ do
     route   $ gsubRoute "content/" mempty
     compile copyFileCompiler
+
+--------------------------------------------------------------------------------
+
+cleanRoute :: Routes
+cleanRoute = customRoute $ (</> "index.html") . dropExtension . toFilePath
 
 --------------------------------------------------------------------------------
 
