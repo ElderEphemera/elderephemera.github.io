@@ -16,7 +16,7 @@ css = do
     color "#FAEDE8"
     backgroundColor "#041816"
     fontFamily ["Fira Sans"] [sansSerif]
-    fontSize $ pt 12
+    fontSize $ pt 13
 
   "a" <> "a"#visited ? do
     color "#F94C39"
