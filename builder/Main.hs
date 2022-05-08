@@ -57,7 +57,7 @@ main = hakyll $ do
   match "templates/*" $ compile templateBodyCompiler
 
   match "projects.html" $ do
-    route   idRoute
+    route   cleanRoute
     compile $ do
       let projects = traverse (either fail pure . traverse eitherDecode)
             =<< loadAll "projects/*/info.json"
