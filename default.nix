@@ -16,7 +16,7 @@ let
       ".gitignore"
       ".git"
       ".gitmodules"
-      ".circleci"
+      ".github"
       "builder"
       "projects"
       "result"
