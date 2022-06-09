@@ -12,6 +12,7 @@ executable build-site
   build-depends:
     aeson >= 1.5.6 && < 1.6,
     base >= 4.14.1 && < 4.15,
+    bytestring >= 0.10.12 && < 0.11,
     clay >= 0.13.3 && < 0.14,
     filepath >= 1.4.2 && < 1.5,
     hakyll >= 4.14.0 && < 4.15,
