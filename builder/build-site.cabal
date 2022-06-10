@@ -19,5 +19,5 @@ executable build-site
     text >= 1.2.4 && < 1.3,
     unordered-containers >= 0.2.13 && < 0.3
   default-language: Haskell2010
-  default-extensions: OverloadedStrings
+  default-extensions: OverloadedStrings ImportQualifiedPost
   ghc-options: -Wall

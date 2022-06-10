@@ -1,7 +1,7 @@
 module Style (Style.style) where
 
 import Clay
-import qualified Clay.Flexbox as F
+import Clay.Flexbox qualified as F
 
 import Data.Text.Lazy (unpack)
 

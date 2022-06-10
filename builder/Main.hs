@@ -3,10 +3,10 @@
 module Main (main) where
 
 import Data.Aeson (Value(..), eitherDecode, encode, (.=))
-import qualified Data.ByteString.Lazy.Char8 as BS (unpack)
+import Data.ByteString.Lazy.Char8 qualified as BS (unpack)
 import Data.HashMap.Strict ((!?))
 import Data.Maybe (fromMaybe)
-import qualified Data.Text as T (pack, unpack)
+import Data.Text qualified as T (pack, unpack)
 import GHC.Exts (toList)
 import System.FilePath (dropExtension, (</>))
 
