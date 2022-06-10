@@ -106,6 +106,10 @@ jsonCtx = Context $ \name _ (Item _ meta) ->
     getField (Array arr) [] = Just
       $ ListField jsonCtx <$> traverse makeItem (toList arr)
     getField (String txt) [] = Just . pure . StringField $ T.unpack txt
+    getField (Number num) [] = Just . pure . StringField $ show num
+    getField (Bool True) [] = Just $ pure EmptyField
+    getField (Bool False) [] = Just $ noResult "Field is false"
+    getField Null [] = Just $ noResult "Field is null"
     getField _ _ = Nothing
 
     object key value = Object $ "key" .= key <> "value" .= value 
