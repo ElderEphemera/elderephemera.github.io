@@ -12,11 +12,11 @@ title: Projects
   $for(projects)$
     <li>
       <div class="project-header">
-        <h2 class="project-name"><a href="projects/$link$">$title$</a></h2>
+        <h2 class="project-name"><a href="/projects/$link$">$title$</a></h2>
         <div class="project-badges">
           $for(badges)$
             <a href="$link$" title="$name$">
-              <img src="images/$image$" alt="$name$" height="32"/>
+              <img src="/images/$image$" alt="$name$" height="32"/>
             </a>
           $endfor$
         </div>
