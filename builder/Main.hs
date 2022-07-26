@@ -9,6 +9,8 @@ import Data.Maybe (fromMaybe)
 import Data.Text qualified as T (pack, unpack)
 import GHC.Exts (toList)
 import System.FilePath (dropExtension, (</>))
+import Text.Pandoc.Highlighting (Style, breezeDark, styleToCss)
+import Text.Pandoc.Options (WriterOptions (..))
 
 import Hakyll
 
@@ -26,9 +28,13 @@ main = hakyll $ do
     route   idRoute
     compile $ makeItem style
 
+  create ["css/syntax.css"] $ do
+    route   idRoute
+    compile $ makeItem $ styleToCss pandocCodeStyle
+
   match "posts/**" $ do
     route   cleanRoute
-    compile $ pandocCompiler
+    compile $ pandocCompiler'
       >>= loadAndApplyTemplate "templates/post.html"    postCtx
       >>= loadAndApplyTemplate "templates/default.html" postCtx
       >>= relativizeUrls
@@ -81,6 +87,18 @@ main = hakyll $ do
 
 cleanRoute :: Routes
 cleanRoute = customRoute $ (</> "index.html") . dropExtension . toFilePath
+
+--------------------------------------------------------------------------------
+
+pandocCodeStyle :: Style
+pandocCodeStyle = breezeDark
+
+pandocCompiler' :: Compiler (Item String)
+pandocCompiler' = pandocCompilerWith
+  defaultHakyllReaderOptions
+  defaultHakyllWriterOptions
+    { writerHighlightStyle = Just pandocCodeStyle
+    }
 
 --------------------------------------------------------------------------------
 

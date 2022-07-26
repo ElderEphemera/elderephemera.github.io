@@ -11,7 +11,7 @@ style = unpack $ render css
 css :: Css
 css = do
   "body" ? do
-    maxWidth $ px 900
+    maxWidth $ px 925
     margin auto auto auto auto
     color "#FAEDE8"
     backgroundColor "#07211e"
@@ -55,6 +55,20 @@ css = do
     padding (px 5) (px 20) (px 5) (px 20)
     margin (px 20) (px 15) (px 0) (px 15)
     borderRadius (px 20) (px 20) (px 20) (px 20)
+
+  "div" # ".sourceCode" ? do
+    sym padding (px 15)
+    borderStyle solid
+    borderWidth4 (px 0) (px 0) (px 3) (px 3)
+    borderColor "#0d4943"
+    borderTopRightRadius (px 15) (px 15)
+    important $ backgroundColor "#092b27"
+
+    "code" ? sym padding (px 0)
+
+  "code" ? do
+    sym2 padding (px 1) (px 5)
+    backgroundColor "#092b27"
 
   "#postlist" ? do
     listStyleType none
