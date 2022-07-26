@@ -14,7 +14,7 @@ css = do
     maxWidth $ px 900
     margin auto auto auto auto
     color "#FAEDE8"
-    backgroundColor "#041816"
+    backgroundColor "#07211e"
     fontFamily ["Fira Sans"] [sansSerif]
     fontSize $ pt 13
 
@@ -51,7 +51,7 @@ css = do
     textTransform uppercase
 
   "#content" ? do
-    backgroundColor "#071410"
+    backgroundColor "#081914"
     padding (px 5) (px 20) (px 5) (px 20)
     margin (px 20) (px 15) (px 0) (px 15)
     borderRadius (px 20) (px 20) (px 20) (px 20)
