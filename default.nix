@@ -10,8 +10,8 @@ let
   builder = import ./builder { inherit pkgs; };
   projects = import ./projects { inherit pkgs; };
 
-  site = pkgs.stdenv.mkDerivation {
-    name = "elderephemera.github.io";
+  source = pkgs.stdenv.mkDerivation {
+    name = "elderephemera.github.io-source";
     src = pkgs.nix-gitignore.gitignoreSourcePure [
       ".gitignore"
       ".git"
@@ -20,7 +20,23 @@ let
       "builder"
       "projects"
       "result"
+      "stage"
     ] ./.;
+
+    buildInputs = [ projects ];
+
+    dontBuild = true;
+    installPhase = ''
+      cp -r $src $out
+      chmod +w $out
+      cp -r ${projects} $out/projects
+      chmod -w $out
+    '';
+  };
+
+  site = pkgs.stdenv.mkDerivation {
+    name = "elderephemera.github.io";
+    src = source;
     buildInputs = [ builder projects ] ++ optional checkLinks pkgs.linkchecker;
 
     LOCALE_ARCHIVE = "${pkgs.glibcLocales}/lib/locale/locale-archive";
@@ -31,7 +47,6 @@ let
       optional checkNoDrafts "checkNoDraftsPhase";
 
     buildPhase = ''
-      cp -r ${projects} projects
       ${builder}/bin/build-site build
     '';
     checkLinksPhase = ''
@@ -46,4 +61,4 @@ let
     '';
   };
 
-in { inherit builder projects site; }
+in { inherit builder projects source site; }
