@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> {}
+{ pkgs ? import ../nix/pinned-nixpkgs.nix
 }:
 
 (pkgs.haskellPackages.developPackage {
