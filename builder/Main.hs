@@ -8,7 +8,10 @@ import Data.Aeson.KeyMap qualified as KM (lookup)
 import Data.ByteString.Lazy.Char8 qualified as BS (unpack)
 import Data.Maybe (fromMaybe)
 import Data.Text qualified as T (unpack)
+import Data.Text.Lazy qualified as LT (pack)
 import GHC.Exts (toList)
+import Skylighting (defaultSyntaxMap)
+import Skylighting.Parser (addSyntaxDefinition, parseSyntaxDefinitionFromText)
 import System.FilePath (dropExtension, (</>))
 import Text.Pandoc.Highlighting (Style, breezeDark, styleToCss)
 import Text.Pandoc.Options (WriterOptions (..))
@@ -84,6 +87,8 @@ main = hakyll $ do
     route   $ gsubRoute "content/" mempty
     compile copyFileCompiler
 
+  match "syntax/*" $ compile getResourceString
+
 --------------------------------------------------------------------------------
 
 cleanRoute :: Routes
@@ -95,11 +100,18 @@ pandocCodeStyle :: Style
 pandocCodeStyle = breezeDark
 
 pandocCompiler' :: Compiler (Item String)
-pandocCompiler' = pandocCompilerWith
-  defaultHakyllReaderOptions
-  defaultHakyllWriterOptions
-    { writerHighlightStyle = Just pandocCodeStyle
-    }
+pandocCompiler' = do
+  syntaxDescriptions <- loadAll "syntax/*" :: Compiler [Item String]
+  let parse (Item itemId syntaxDesc) =
+        parseSyntaxDefinitionFromText (toFilePath itemId) (LT.pack syntaxDesc)
+  syntaxDefinitions <- traverse (either fail pure . parse) syntaxDescriptions
+  let syntaxMap = foldr addSyntaxDefinition defaultSyntaxMap syntaxDefinitions
+  pandocCompilerWith
+    defaultHakyllReaderOptions
+    defaultHakyllWriterOptions
+      { writerHighlightStyle = Just pandocCodeStyle
+      , writerSyntaxMap = syntaxMap
+      }
 
 --------------------------------------------------------------------------------
 
