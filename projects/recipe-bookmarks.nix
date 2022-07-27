@@ -10,7 +10,7 @@ let
   };
 in {
   name = "recipe-bookmarks";
-  path = import repo { inherit pkgs; };
+  path = import repo {};
   info = {
     title = "Recipe Bookmarks";
     link = "recipe-bookmarks/index.html";

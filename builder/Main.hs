@@ -3,10 +3,11 @@
 module Main (main) where
 
 import Data.Aeson (Value(..), eitherDecode, encode, (.=))
+import Data.Aeson.Key qualified as Key (fromString)
+import Data.Aeson.KeyMap qualified as KM (lookup)
 import Data.ByteString.Lazy.Char8 qualified as BS (unpack)
-import Data.HashMap.Strict ((!?))
 import Data.Maybe (fromMaybe)
-import Data.Text qualified as T (pack, unpack)
+import Data.Text qualified as T (unpack)
 import GHC.Exts (toList)
 import System.FilePath (dropExtension, (</>))
 import Text.Pandoc.Highlighting (Style, breezeDark, styleToCss)
@@ -118,7 +119,7 @@ jsonCtx = Context $ \name _ (Item _ meta) ->
   fromMaybe (failure meta) . getField meta $ splitName name
   where
     getField (Object obj) (n:ns)
-      | Just val <- obj !? T.pack n = getField val ns
+      | Just val <- KM.lookup (Key.fromString n) obj = getField val ns
     getField (Object obj) [] = Just
       $ ListField jsonCtx <$> traverse (makeItem . uncurry object) (toList obj)
     getField (Array arr) [] = Just

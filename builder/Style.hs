@@ -34,7 +34,7 @@ css = do
   "#header" ? do
     padding (px 12) (px 10) (px 3) (px 10)
     margin 0 (px 10) 0 (px 10)
-    borderBottom solid (px 2) "#C92C29"
+    borderBottom (px 2) solid "#C92C29"
     display flex
     flexWrap F.wrap
     justifyContent spaceBetween
@@ -75,12 +75,12 @@ css = do
     padding (px 0) (px 8) (px 0) (px 8)
 
     "li" ? do
-      borderTop solid (px 1) "#FAEDE8"
+      borderTop (px 1) solid "#FAEDE8"
       padding (px 10) (px 10) (px 10) (px 10)
       display flex
       flexWrap F.wrap
       justifyContent spaceBetween
-      lastChild & borderBottom solid (px 1) "#FAEDE8"
+      lastChild & borderBottom (px 1) solid "#FAEDE8"
       "a" ? F.flex 1 1 auto;
       "span" ? do
         color "#756E63"
