@@ -43,23 +43,12 @@ main = hakyll $ do
       >>= loadAndApplyTemplate "templates/default.html" postCtx
       >>= relativizeUrls
 
-  create ["archive.html"] $ do
-    route   cleanRoute
-    compile $ do
-      let archiveCtx = listCtx "Archives"
-      makeItem ""
-        >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
-        >>= loadAndApplyTemplate "templates/default.html" archiveCtx
-        >>= relativizeUrls
-
   match "index.html" $ do
     route   idRoute
-    compile $ do
-      let indexCtx = listCtx "Home"
-      getResourceBody
-        >>= applyAsTemplate indexCtx
-        >>= loadAndApplyTemplate "templates/default.html" indexCtx
-        >>= relativizeUrls
+    compile $ getResourceBody
+      >>= applyAsTemplate listCtx
+      >>= loadAndApplyTemplate "templates/default.html" listCtx
+      >>= relativizeUrls
 
   match "404.html" $ do
     route   idRoute
@@ -116,14 +105,13 @@ pandocCompiler' = do
 --------------------------------------------------------------------------------
 
 postCtx :: Context String
-postCtx =
-     dateField "date" "%B %e, %Y"
+postCtx
+  =  dateField "date" "%B %e, %Y"
   <> defaultContext
 
-listCtx :: String -> Context String
-listCtx title =
-     listField "posts" postCtx (recentFirst =<< loadAll "posts/**")
-  <> constField "title" title
+listCtx :: Context String
+listCtx
+  =  listField "posts" postCtx (recentFirst =<< loadAll "posts/**")
   <> defaultContext
 
 jsonCtx :: Context Value
