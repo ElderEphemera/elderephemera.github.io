@@ -50,6 +50,12 @@ main = hakyll $ do
       >>= loadAndApplyTemplate "templates/default.html" listCtx
       >>= relativizeUrls
 
+  match "about.html" $ do
+    route   cleanRoute
+    compile $ getResourceBody
+      >>= loadAndApplyTemplate "templates/default.html" defaultContext
+      >>= relativizeUrls
+
   match "404.html" $ do
     route   idRoute
     compile $ getResourceBody
