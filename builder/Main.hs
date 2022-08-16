@@ -10,6 +10,8 @@ import Data.Maybe (fromMaybe)
 import Data.Text qualified as T (unpack)
 import Data.Text.Lazy qualified as LT (pack)
 import GHC.Exts (toList)
+import Image.LaTeX.Render (defaultEnv, latexFontSize, RenderError(..))
+import Image.LaTeX.Render.Pandoc (defaultPandocFormulaOptions, errorDisplay)
 import Skylighting (defaultSyntaxMap)
 import Skylighting.Parser (addSyntaxDefinition, parseSyntaxDefinitionFromText)
 import System.FilePath (dropExtension, (</>))
@@ -17,6 +19,7 @@ import Text.Pandoc.Highlighting (Style, breezeDark, styleToCss)
 import Text.Pandoc.Options (WriterOptions (..))
 
 import Hakyll
+import Hakyll.Contrib.LaTeX (compileFormulaeSVG)
 
 import Style (style)
 
@@ -101,12 +104,21 @@ pandocCompiler' = do
         parseSyntaxDefinitionFromText (toFilePath itemId) (LT.pack syntaxDesc)
   syntaxDefinitions <- traverse (either fail pure . parse) syntaxDescriptions
   let syntaxMap = foldr addSyntaxDefinition defaultSyntaxMap syntaxDefinitions
-  pandocCompilerWith
+  pandocCompilerWithTransformM
     defaultHakyllReaderOptions
     defaultHakyllWriterOptions
       { writerHighlightStyle = Just pandocCodeStyle
       , writerSyntaxMap = syntaxMap
       }
+    (compileFormulaeSVG
+      defaultEnv { latexFontSize = 15 }
+      defaultPandocFormulaOptions { errorDisplay = error . displayRenderError }
+    )
+
+displayRenderError :: RenderError -> String
+displayRenderError (LaTeXFailure str) = "LaTeXFailure: \n" <> str
+displayRenderError (DVISVGMFailure str) = "DVISVGMFailure: \n" <> str
+displayRenderError (IOException ex) = "IOException: \n" <> show ex
 
 --------------------------------------------------------------------------------
 

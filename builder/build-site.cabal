@@ -16,6 +16,9 @@ executable build-site
     clay >= 0.14.0 && < 0.15,
     filepath >= 1.4.2 && < 1.5,
     hakyll >= 4.15.1 && < 4.16,
+    latex-svg-hakyll >= 0.2 && < 0.3,
+    latex-svg-image >= 0.2 && < 0.3,
+    latex-svg-pandoc >= 0.2.1 && < 0.3,
     pandoc >= 2.17.1 && < 2.18,
     skylighting >= 0.12.3 && < 0.13,
     text >= 1.2.5 && < 1.3

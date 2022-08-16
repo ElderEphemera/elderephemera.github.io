@@ -70,6 +70,8 @@ css = do
     sym2 padding (px 1) (px 5)
     backgroundColor "#092b27"
 
+  "svg" ? Clay.filter (invert 100)
+
   "#postlist" ? do
     listStyleType none
     padding (px 0) (px 8) (px 0) (px 8)

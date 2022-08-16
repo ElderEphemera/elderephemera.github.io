@@ -2,9 +2,9 @@
 }:
 
 let
-  inherit (import ./. { inherit pkgs; }) projects source builder;
+  inherit (import ./. { inherit pkgs; }) projects source builder site;
 in pkgs.mkShell {
-  inputsFrom = [ builder ];
+  inputsFrom = [ builder site ];
   shellHook = ''
     [ -d stage/_site ] && chmod -R +w stage/_site
     [ -d stage ] && rm -r stage

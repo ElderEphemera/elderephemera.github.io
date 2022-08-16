@@ -37,7 +37,16 @@ let
   site = pkgs.stdenv.mkDerivation {
     name = "elderephemera.github.io";
     src = source;
-    buildInputs = [ builder projects ] ++ optional checkLinks pkgs.linkchecker;
+    buildInputs = [
+      (pkgs.texlive.combine {
+        inherit (pkgs.texlive)
+          scheme-basic
+          dvisvgm
+          extsizes
+          preview
+        ;
+      })
+    ] ++ optional checkLinks pkgs.linkchecker;
 
     LOCALE_ARCHIVE = "${pkgs.glibcLocales}/lib/locale/locale-archive";
     LC_ALL = "C.UTF-8";
