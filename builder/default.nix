@@ -14,9 +14,9 @@
   });
 
   overrides = self: super: with pkgs.haskell.lib; {
-    latex-svg-hakyll = doJailbreak super.latex-svg-hakyll;
-    latex-svg-pandoc = doJailbreak super.latex-svg-pandoc;
-    latex-svg-image = doJailbreak super.latex-svg-image;
+    latex-svg-hakyll = markUnbroken (doJailbreak super.latex-svg-hakyll);
+    latex-svg-pandoc = markUnbroken (doJailbreak super.latex-svg-pandoc);
+    latex-svg-image = markUnbroken (doJailbreak super.latex-svg-image);
   };
 
 }).overrideAttrs (old: {
