@@ -29,5 +29,6 @@ jobs:
       with:
         target_branch: site
         build_dir: site
+        fqdn: elderephemera.com
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
