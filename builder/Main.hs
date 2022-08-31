@@ -14,7 +14,7 @@ import Image.LaTeX.Render (defaultEnv, latexFontSize, RenderError(..))
 import Image.LaTeX.Render.Pandoc (defaultPandocFormulaOptions, errorDisplay)
 import Skylighting (defaultSyntaxMap)
 import Skylighting.Parser (addSyntaxDefinition, parseSyntaxDefinitionFromText)
-import System.FilePath (dropExtension, (</>))
+import System.FilePath (dropExtension, dropFileName, takeFileName, (</>))
 import Text.Pandoc.Highlighting (Style, breezeDark, styleToCss)
 import Text.Pandoc.Options (WriterOptions (..))
 
@@ -125,7 +125,12 @@ displayRenderError (IOException ex) = "IOException: \n" <> show ex
 postCtx :: Context String
 postCtx
   =  dateField "date" "%B %e, %Y"
+  <> mapContext stripIndex (urlField "url")
   <> defaultContext
+  where
+    stripIndex url
+      | takeFileName url == "index.html" = dropFileName url
+      | otherwise = url
 
 listCtx :: Context String
 listCtx
