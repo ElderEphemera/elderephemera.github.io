@@ -5,8 +5,8 @@ let
   repo = pkgs.fetchFromGitHub {
     owner = "elderephemera";
     repo = "recipe-bookmarks";
-    rev = "e6949219bbd26a411b229ef9018d16e2b465c613";
-    sha256 = "14kd17hcgf1vv7vspv4h3s6qmv5gl3gyijxr7f4g2sccjif7zh3s";
+    rev = "35567a3f0f2a6750ff355fbca5ec9ad13f003d9f";
+    sha256 = "1jsj87xqp8c6gvnkqimcw5kw8l538h5nxf5w7y9hzmwzi26kw5xk";
   };
 in {
   name = "recipe-bookmarks";
