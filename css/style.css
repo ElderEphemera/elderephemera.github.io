@@ -1,0 +1,194 @@
+
+body
+{
+  max-width        : 925px;
+  margin           : auto auto auto auto;
+  color            : #faede8;
+  background-color : #07211e;
+  font-family      : "Fira Sans", sans-serif;
+  font-size        : 13pt;
+}
+
+a,
+a:visited
+{
+  color           : #f94c39;
+  text-decoration : none;
+}
+
+a:hover,
+a:focus
+{
+  color : #a83614;
+}
+
+
+#header a,
+#footer a
+{
+  color : #c92c29;
+}
+
+
+#navigation a:hover,
+#footer a:hover
+{
+  color : #96161b;
+}
+
+#header
+{
+  padding         : 12px 10px 3px 10px;
+  margin          : 0px 10px 0px 10px;
+  border-bottom   : 2px solid #c92c29;
+  display         : flex;
+  flex-wrap       : wrap;
+  justify-content : space-between;
+  font-weight     : bold;
+}
+
+#logo
+{
+  flex      : 1 1 auto;
+  font-size : 20pt;
+}
+
+#navigation
+{
+  flex           : 1 1 auto;
+  text-align     : right;
+  align-self     : flex-end;
+  text-transform : uppercase;
+}
+
+#content
+{
+  background-color : #081914;
+  padding          : 5px 20px 5px 20px;
+  margin           : 20px 15px 0px 15px;
+  border-radius    : 20px 20px 20px 20px;
+}
+
+div.sourceCode
+{
+  padding                 : 15px 15px 15px 15px;
+  border-style            : solid;
+  border-width            : 0px 0px 3px 3px;
+  border-color            : #0d4943;
+  border-top-right-radius : 15px 15px;
+  background-color        : #092b27 !important;
+}
+
+div.sourceCode code
+{
+  padding : 0px 0px 0px 0px;
+}
+
+code
+{
+  padding          : 1px 5px 1px 5px;
+  background-color : #092b27;
+}
+
+svg
+{
+  -webkit-filter : invert(100%);
+  -moz-filter    : invert(100%);
+  -ms-filter     : invert(100%);
+  -o-filter      : invert(100%);
+  filter         : invert(100%);
+}
+
+#postlist
+{
+  list-style-type : none;
+  padding         : 0px 8px 0px 8px;
+}
+
+#postlist li
+{
+  border-top      : 1px solid #faede8;
+  padding         : 10px 10px 10px 10px;
+  display         : flex;
+  flex-wrap       : wrap;
+  justify-content : space-between;
+}
+
+#postlist li:last-child
+{
+  border-bottom : 1px solid #faede8;
+}
+
+#postlist li a
+{
+  flex : 1 1 auto;
+}
+
+#postlist li span
+{
+  color      : #756e63;
+  flex       : 0 0 auto;
+  text-align : right;
+}
+
+#projectlist
+{
+  list-style-type : none;
+  margin          : 0px 0px 0px 0px;
+  padding         : 0px 10px 15px 10px;
+}
+
+#projectlist li
+{
+  background-color : #202522;
+  border-radius    : 15px 15px 15px 15px;
+  margin-top       : 20px;
+}
+
+#projectlist li .project-header
+{
+  display          : flex;
+  flex-wrap        : wrap;
+  justify-content  : space-between;
+  background-color : #27322d;
+  padding          : 0px 13px 15px 23px;
+  border-radius    : 15px 15px 0px 0px;
+}
+
+#projectlist li .project-header .project-name
+{
+  margin    : 20px 0px 0px 0px;
+  flex      : 1 1 auto;
+  font-size : 30px;
+}
+
+#projectlist li .project-header .project-badges
+{
+  flex       : 1 1 auto;
+  text-align : right;
+  align-self : flex-end;
+}
+
+#projectlist li .project-header .project-badges a
+{
+  padding-right : 8px;
+}
+
+#projectlist li .project-description
+{
+  padding : 6px 23px 18px 23px;
+}
+
+#footer
+{
+  background-color : #202a28;
+  font-size        : 10pt;
+  border-radius    : 20px 20px 20px 20px;
+  width            : 240px;
+  padding          : 5px 0px 5px 0px;
+  margin           : 10px auto 10px auto;
+  text-align       : center;
+}
+
+
+/* Generated with Clay, http://fvisser.nl/clay */
