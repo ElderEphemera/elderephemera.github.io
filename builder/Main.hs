@@ -15,8 +15,10 @@ import Image.LaTeX.Render.Pandoc (defaultPandocFormulaOptions, errorDisplay)
 import Skylighting (defaultSyntaxMap)
 import Skylighting.Parser (addSyntaxDefinition, parseSyntaxDefinitionFromText)
 import System.FilePath (dropExtension, dropFileName, takeFileName, (</>))
+import Text.Pandoc
+  (Block(..), Inline(..), MathType(..), Pandoc, WriterOptions(..))
 import Text.Pandoc.Highlighting (Style, breezeDark, styleToCss)
-import Text.Pandoc.Options (WriterOptions (..))
+import Text.Pandoc.Walk (walk)
 
 import Hakyll
 import Hakyll.Contrib.LaTeX (compileFormulaeSVG)
@@ -110,15 +112,20 @@ pandocCompiler' = do
       { writerHighlightStyle = Just pandocCodeStyle
       , writerSyntaxMap = syntaxMap
       }
-    (compileFormulaeSVG
-      defaultEnv { latexFontSize = 15 }
-      defaultPandocFormulaOptions { errorDisplay = error . displayRenderError }
-    )
+    pandocProcessLatex
 
-displayRenderError :: RenderError -> String
-displayRenderError (LaTeXFailure str) = "LaTeXFailure: \n" <> str
-displayRenderError (DVISVGMFailure str) = "DVISVGMFailure: \n" <> str
-displayRenderError (IOException ex) = "IOException: \n" <> show ex
+pandocProcessLatex :: Pandoc -> Compiler Pandoc
+pandocProcessLatex = compileFormulaeSVG
+  defaultEnv { latexFontSize = 15 }
+  defaultPandocFormulaOptions { errorDisplay = error . displayRenderError }
+  . walk wrapBlock
+  where
+    displayRenderError (LaTeXFailure str) = "LaTeXFailure: \n" <> str
+    displayRenderError (DVISVGMFailure str) = "DVISVGMFailure: \n" <> str
+    displayRenderError (IOException ex) = "IOException: \n" <> show ex
+
+    wrapBlock math@(Para [Math DisplayMath _]) = Div ("", ["math"], []) [math]
+    wrapBlock other = other
 
 --------------------------------------------------------------------------------
 

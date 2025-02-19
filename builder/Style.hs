@@ -70,6 +70,8 @@ css = do
     sym2 padding (px 1) (px 5)
     backgroundColor "#092b27"
 
+  ".math" |> "p" ? overflow auto
+
   "svg" ? Clay.filter (invert 100)
 
   "#postlist" ? do
