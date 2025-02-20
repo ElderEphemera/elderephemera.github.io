@@ -66,6 +66,10 @@ css = do
 
     "code" ? sym padding (px 0)
 
+  "pre" # ".wrap-code" |> "code" # ".sourceCode" ? do
+    whiteSpace $ other "break-spaces"
+    "line-break" -: "anywhere"
+
   "code" ? do
     sym2 padding (px 1) (px 5)
     backgroundColor "#092b27"
