@@ -6,12 +6,12 @@
     "dist-newstyle"
   ] ./.;
 
-  modifier = drv: pkgs.haskell.lib.overrideCabal drv (attrs: {
-    buildTools = with pkgs.haskellPackages; (attrs.buildTools or []) ++ [
+  modifier = drv: pkgs.haskell.lib.addBuildTools drv (
+    with pkgs.haskellPackages; [
       cabal-install
-      hakyll
-    ];
-  });
+      ghcid
+    ]
+  );
 
   overrides = self: super: with pkgs.haskell.lib; {
     latex-svg-hakyll = markUnbroken (doJailbreak super.latex-svg-hakyll);
