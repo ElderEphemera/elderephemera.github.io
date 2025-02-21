@@ -7,4 +7,7 @@ test:
 ghcid:
 	nix-shell builder --run "cd builder; ghcid -c 'cabal repl'"
 
-.PHONY: site test ghcid
+host:
+	nix-shell -p busybox --run 'httpd -f -v -p 8080 -h result'
+
+.PHONY: site test ghcid host
