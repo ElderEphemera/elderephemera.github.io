@@ -1,3 +1,5 @@
+{-# LANGUAGE NegativeLiterals #-}
+
 module Style (Style.style) where
 
 import Clay
@@ -73,6 +75,47 @@ css = do
   "code" ? do
     sym2 padding (px 1) (px 5)
     backgroundColor "#092b27"
+
+  ".collapsable" ? do
+    position relative
+
+    "input" # ("type" @= "checkbox") # checked |~ ".sourceCode" ? do
+      maxHeight (px 64)
+      overflowY $ other "clip"
+      "overflow-clip-margin" -: "15px"
+
+    ".sourceCode" <? do
+      position relative
+
+      before & do
+        "content" -: "\"\\00a0\\00a0\""
+        float floatRight
+        fontSize (pct 90)
+
+    "input" # ("type" @= "checkbox") ? do
+      position absolute
+      zIndex 1
+      top (px 12)
+      right (px 12)
+      Key browsers <> "appearance" -: "none"
+      backgroundColor "#081914"
+      sym margin (px 0)
+      "font" -: "inherit"
+      color "#081914"
+      width (em 1.5)
+      height (em 1.5)
+      sym borderRadius (em 0.75)
+      border (em 0.2) solid "#092b27"
+      transform $ translate (px 10) (px -9)
+      display grid
+      "place-content" -: "center"
+
+      checked <> before & do
+        "content" -: "\"\""
+        width (em 0.7)
+        height (em 0.7)
+        sym borderRadius (em 0.35)
+        boxShadow . pure . bsInset . bsColor "#a83614" $ shadow (em 1) (em 1)
 
   ".math" |> "p" ? overflow auto
 

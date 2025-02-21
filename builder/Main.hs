@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Main (main) where
@@ -7,7 +8,7 @@ import Data.Aeson.Key qualified as Key (fromString)
 import Data.Aeson.KeyMap qualified as KM (lookup)
 import Data.ByteString.Lazy.Char8 qualified as BS (unpack)
 import Data.Maybe (fromMaybe)
-import Data.Text qualified as T (unpack)
+import Data.Text qualified as T (length, lines, unpack)
 import Data.Text.Lazy qualified as LT (pack)
 import GHC.Exts (toList)
 import Image.LaTeX.Render (defaultEnv, latexFontSize, RenderError(..))
@@ -16,7 +17,9 @@ import Skylighting (defaultSyntaxMap)
 import Skylighting.Parser (addSyntaxDefinition, parseSyntaxDefinitionFromText)
 import System.FilePath (dropExtension, dropFileName, takeFileName, (</>))
 import Text.Pandoc
-  (Block(..), Inline(..), MathType(..), Pandoc, WriterOptions(..))
+  ( Block(..), Format(..), Inline(..), MathType(..), Pandoc(..)
+  , WriterOptions(..)
+  )
 import Text.Pandoc.Highlighting (Style, breezeDark, styleToCss)
 import Text.Pandoc.Walk (walk)
 
@@ -112,10 +115,10 @@ pandocCompiler' = do
       { writerHighlightStyle = Just pandocCodeStyle
       , writerSyntaxMap = syntaxMap
       }
-    pandocProcessLatex
+    $ processLatex . collapsableCodeBlocks
 
-pandocProcessLatex :: Pandoc -> Compiler Pandoc
-pandocProcessLatex = compileFormulaeSVG
+processLatex :: Pandoc -> Compiler Pandoc
+processLatex = compileFormulaeSVG
   defaultEnv { latexFontSize = 15 }
   defaultPandocFormulaOptions { errorDisplay = error . displayRenderError }
   . walk wrapBlock
@@ -126,6 +129,19 @@ pandocProcessLatex = compileFormulaeSVG
 
     wrapBlock math@(Para [Math DisplayMath _]) = Div ("", ["math"], []) [math]
     wrapBlock other = other
+
+collapsableCodeBlocks :: Pandoc -> Pandoc
+collapsableCodeBlocks = walk $ \case
+  code@(CodeBlock (_, classes, _) text)
+    | "wrap-code" `elem` classes && T.length text > 400
+    || length (T.lines text) > 10
+    -> Div ("", ["collapsable"], [])
+      [ RawBlock (Format "html") $
+        "<input type='checkbox' class='collapse'  " <> checked <> " />"
+      , code
+      ]
+    where checked = if "collapsed" `elem` classes then "checked" else ""
+  other -> other
 
 --------------------------------------------------------------------------------
 
