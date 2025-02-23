@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="console" version="1" kateversion="2.2" section="Markup">
+  <highlighting>
+    <contexts>
+      <context attribute="Normal Text" lineEndContext="#stay" name="CommandLine" >
+        <RegExpr attribute="Prompt" context="BashOneLine##Bash" String="^\$ " />
+      </context>
+    </contexts>
+    <itemDatas>
+      <itemData name="Prompt" defStyleNum="dsKeyword"/>
+    </itemDatas>
+  </highlighting>
+</language>
