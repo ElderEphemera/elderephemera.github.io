@@ -24,7 +24,7 @@ import Text.Pandoc.Highlighting (Style, breezeDark, styleToCss)
 import Text.Pandoc.Walk (walk)
 
 import Hakyll
-import Hakyll.Contrib.LaTeX (compileFormulaeSVG)
+import Hakyll.Contrib.LaTeX (initFormulaCompilerSVG)
 
 import Style (style)
 
@@ -46,7 +46,8 @@ main = hakyll $ do
 
   match "posts/**" $ do
     route   cleanRoute
-    compile $ pandocCompiler'
+    processLatex <- preprocess initLatexCompiler
+    compile $ pandocCompiler' processLatex
       >>= loadAndApplyTemplate "templates/post.html"    postCtx
       >>= loadAndApplyTemplate "templates/default.html" postCtx
       >>= relativizeUrls
@@ -102,8 +103,8 @@ cleanRoute = customRoute $ (</> "index.html") . dropExtension . toFilePath
 pandocCodeStyle :: Style
 pandocCodeStyle = breezeDark
 
-pandocCompiler' :: Compiler (Item String)
-pandocCompiler' = do
+pandocCompiler' :: (Pandoc -> Compiler Pandoc) -> Compiler (Item String)
+pandocCompiler' processLatex = do
   syntaxDescriptions <- loadAll "syntax/*" :: Compiler [Item String]
   let parse (Item itemId syntaxDesc) =
         parseSyntaxDefinitionFromText (toFilePath itemId) (LT.pack syntaxDesc)
@@ -117,12 +118,16 @@ pandocCompiler' = do
       }
     $ processLatex . collapsableCodeBlocks
 
-processLatex :: Pandoc -> Compiler Pandoc
-processLatex = compileFormulaeSVG
-  defaultEnv { latexFontSize = 15 }
-  defaultPandocFormulaOptions { errorDisplay = error . displayRenderError }
-  . walk wrapBlock
+initLatexCompiler :: IO (Pandoc -> Compiler Pandoc)
+initLatexCompiler = do
+  formulaComp <- initFormulaCompilerSVG 1000 envOptions
+  pure $ formulaComp formulaOptions . walk wrapBlock
   where
+    envOptions = defaultEnv { latexFontSize = 15 }
+
+    formulaOptions =
+      defaultPandocFormulaOptions { errorDisplay = error . displayRenderError }
+
     displayRenderError (LaTeXFailure str) = "LaTeXFailure: \n" <> str
     displayRenderError (DVISVGMFailure str) = "DVISVGMFailure: \n" <> str
     displayRenderError (IOException ex) = "IOException: \n" <> show ex
