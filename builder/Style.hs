@@ -2,6 +2,8 @@
 
 module Style (Style.style) where
 
+import Prelude hiding (div, span)
+
 import Clay
 import Clay.Flexbox qualified as F
 
@@ -12,30 +14,30 @@ style = unpack $ render css
 
 css :: Css
 css = do
-  "body" ? do
+  body ? do
     maxWidth $ px 925
-    margin auto auto auto auto
+    sym margin auto
     color "#FAEDE8"
     backgroundColor "#07211e"
     fontFamily ["Fira Sans"] [sansSerif]
     fontSize $ pt 13
 
-  "a" <> "a"#visited ? do
+  a <> a#visited ? do
     color "#F94C39"
     textDecoration none
 
-  "a"#hover <> "a"#focus ? do
+  a#hover <> a#focus ? do
     color "#A83614"
 
-  "#header" <> "#footer" ? "a" ? do
+  "#header" <> "#footer" ? a ? do
     color "#C92C29"
 
-  "#navigation" <> "#footer" ? "a"#hover ? do
+  "#navigation" <> "#footer" ? a#hover ? do
     color "#96161B"
 
   "#header" ? do
     padding (px 12) (px 10) (px 3) (px 10)
-    margin 0 (px 10) 0 (px 10)
+    sym2 margin 0 (px 10)
     borderBottom (px 2) solid "#C92C29"
     display flex
     flexWrap F.wrap
@@ -54,11 +56,11 @@ css = do
 
   "#content" ? do
     backgroundColor "#081914"
-    padding (px 5) (px 20) (px 5) (px 20)
+    sym2 padding (px 5) (px 20)
     margin (px 20) (px 15) (px 0) (px 15)
-    borderRadius (px 20) (px 20) (px 20) (px 20)
+    sym borderRadius (px 20)
 
-  "div" # ".sourceCode" ? do
+  div # ".sourceCode" ? do
     sym padding (px 15)
     borderStyle solid
     borderWidth4 (px 0) (px 0) (px 3) (px 3)
@@ -66,20 +68,20 @@ css = do
     borderTopRightRadius (px 15) (px 15)
     important $ backgroundColor "#092b27"
 
-    "code" ? sym padding (px 0)
+    code ? sym padding (px 0)
 
-  "pre" # ".wrap-code" |> "code" # ".sourceCode" ? do
+  pre#".wrap-code" |> code#".sourceCode" ? do
     whiteSpace $ other "break-spaces"
     "line-break" -: "anywhere"
 
-  "code" ? do
+  code ? do
     sym2 padding (px 1) (px 5)
     backgroundColor "#092b27"
 
   ".collapsable" ? do
     position relative
 
-    "input" # ("type" @= "checkbox") # checked |~ ".sourceCode" ? do
+    input # ("type" @= "checkbox") # checked |~ ".sourceCode" ? do
       maxHeight (px 64)
       overflowY $ other "clip"
       "overflow-clip-margin" -: "15px"
@@ -92,7 +94,7 @@ css = do
         float floatRight
         fontSize (pct 90)
 
-    "input" # ("type" @= "checkbox") ? do
+    input # ("type" @= "checkbox") ? do
       position absolute
       zIndex 1
       top (px 12)
@@ -117,35 +119,35 @@ css = do
         sym borderRadius (em 0.35)
         boxShadow . pure . bsInset . bsColor "#a83614" $ shadow (em 1) (em 1)
 
-  ".math" |> "p" ? overflow auto
+  ".math" |> p ? overflow auto
 
-  "svg" ? Clay.filter (invert 100)
+  svg ? Clay.filter (invert 100)
 
   "#postlist" ? do
     listStyleType none
-    padding (px 0) (px 8) (px 0) (px 8)
+    sym2 padding (px 0) (px 8)
 
-    "li" ? do
+    li ? do
       borderTop (px 1) solid "#FAEDE8"
-      padding (px 10) (px 10) (px 10) (px 10)
+      sym padding (px 10)
       display flex
       flexWrap F.wrap
       justifyContent spaceBetween
       lastChild & borderBottom (px 1) solid "#FAEDE8"
-      "a" ? F.flex 1 1 auto;
-      "span" ? do
+      a ? F.flex 1 1 auto;
+      span ? do
         color "#756E63"
         F.flex 0 0 auto
         textAlign $ alignSide sideRight
 
   "#projectlist" ? do
     listStyleType none
-    margin (px 0) (px 0) (px 0) (px 0)
+    sym margin (px 0)
     padding (px 0) (px 10) (px 15) (px 10)
 
-    "li" ? do
+    li ? do
       backgroundColor "#202522"
-      borderRadius (px 15) (px 15) (px 15) (px 15)
+      sym borderRadius (px 15)
       marginTop (px 20)
 
       ".project-header" ? do
@@ -166,15 +168,15 @@ css = do
           textAlign $ alignSide sideRight
           alignSelf flexEnd
 
-          "a" ? paddingRight (px 8)
+          a ? paddingRight (px 8)
 
       ".project-description" ? padding (px 6) (px 23) (px 18) (px 23)
 
   "#footer" ? do
     backgroundColor "#202A28"
     fontSize $ pt 10
-    borderRadius (px 20) (px 20) (px 20) (px 20)
+    sym borderRadius (px 20)
     width $ px 240
-    padding (px 5) (px 0) (px 5) (px 0)
-    margin (px 10) auto (px 10) auto
+    sym2 padding (px 5) (px 0)
+    sym2 margin (px 10) auto
     textAlign center
