@@ -2,7 +2,7 @@
 }:
 
 let
-  projectNames = [ "recipe-bookmarks" "four" ];
+  projectNames = [ "recipe-bookmarks" "four" "amigalite-ark" ];
   importProject = name: import (./. + "/${name}.nix") { inherit pkgs; };
 
   infoFile = info: pkgs.writeText "info.json" (builtins.toJSON info);
