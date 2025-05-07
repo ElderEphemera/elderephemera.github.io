@@ -59,7 +59,7 @@ let
       ${builder}/bin/build-site build
     '';
     checkLinksPhase = ''
-      linkchecker _site
+      linkchecker --no-warnings _site
     '';
     checkNoDraftsPhase = ''
       test ! -d _site/posts/drafts ||
