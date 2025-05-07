@@ -1,12 +1,16 @@
 { pkgs ? import <nixpkgs> {}
 }:
 
-{
-  name = "amigalite-ark";
-  path = builtins.fetchTarball {
-    url = "https://github.com/ElderEphemera/amigalite-ark/releases/download/v0.3/ark-web.tar.gz";
-    sha256 = "0319blb3f6b50jnzw90gmbisna00dcd6ddj6p3fx91v66cn5ljfx";
+let
+  repo = pkgs.fetchFromGitHub {
+    owner = "elderephemera";
+    repo = "amigalite-ark";
+    rev = "3137fca85ce29fa49ac9ed224f9b453cf666f215";
+    sha256 = "HTllANs3yIYgPXvX1hP842Yacx1+m0yKc8G5hdc4x+Y=";
   };
+in {
+  name = "amigalite-ark";
+  path = (import repo {}).web;
   info = {
     title = "An Ark for the Amigalites";
     link = "amigalite-ark/index.html";
