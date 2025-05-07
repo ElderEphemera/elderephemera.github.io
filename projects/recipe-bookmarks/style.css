@@ -1,0 +1,84 @@
+body, a {
+  color: #111;
+  background-color: #FFF;
+}
+
+@media (prefers-color-scheme: dark) {
+  body, a {
+    color: #EEE;
+    background-color: #111;
+  }
+
+  input[type='text'], input[type='submit'], button {
+    color: #EEE;
+    background-color: #333;
+    border: 2px solid #222;
+  }
+}
+
+#contents {
+  max-width: 60em;
+  padding: 8px;
+  margin: 0 auto;
+}
+
+form {
+  max-width: 40em;
+  margin: 0 auto;
+}
+
+form h1 {
+  text-align: center;
+}
+
+form input[type="text"] {
+  margin-top: 18px;
+  margin-right: 4px;
+  width: calc(100% - 58px);
+}
+
+form input[type="submit"] {
+  width: 46px;
+}
+
+#error {
+  text-align: center;
+}
+
+#error div {
+  margin-bottom: 10px;
+}
+
+h1, h2, h3, h4 {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+#yield {
+  margin-bottom: 16px
+}
+
+ul, ol {
+  margin-top: 8px;
+  padding-left: 34px;
+}
+
+#instructions li {
+  margin-top: 10px;
+}
+
+#times dt {
+  display: inline-block;
+}
+
+#times dd {
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 8px;
+  padding-right: 8px;
+  border-right: 2px solid #888
+}
+
+#times dd:last-child  {
+  border: none;
+}
