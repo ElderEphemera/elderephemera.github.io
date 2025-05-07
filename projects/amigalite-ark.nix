@@ -16,7 +16,7 @@ in {
     link = "amigalite-ark/index.html";
     description = ''
       A small fishing game where you can listen to music and create image
-      collages. This was created for
+      collages. This was created in a week for
       <a href="https://itch.io/jam/discmaster-jam">the DiscMaster game jam</a>.
       100% of the assets come from <a href="https://discmaster.textfiles.com/">
       DiscMaster</a>, a search engine for vintage data hosted on the Internet
@@ -27,6 +27,11 @@ in {
         name = "GitHub";
         link = "https://github.com/ElderEphemera/amigalite-ark";
         image = "GitHub-Mark-Light-32px.png";
+      }
+      {
+        name = "itch.io";
+        link = "https://elderephemera.itch.io/amigalite-ark";
+        image = "itchio-textless-white.svg";
       }
     ];
   };
