@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ElderEphemera - Hosting Static Web Projects With Hakyll And Nix</title>
+        <link rel="stylesheet" href="https://code.cdn.mozilla.net/fonts/fira.css">
+        <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../../">ElderEphemera</a>
+            </div>
+            <div id="navigation">
+                <a href="../../">Home</a>
+                <a href="../../about">About</a>
+		<a href="../../projects">Projects</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1 id="title">Hosting Static Web Projects With Hakyll And Nix</h1>
+            <div><div class="info">
+    Posted on August 31, 2022
+    
+</div>
+
+<p>I got this blog setup a while ago so I figure I should finally get around to
+writing a post. And what better topic than the blog setup itself!</p>
+<p>First, a bit of background. I setup the Nix part of the site based mostly on
+Rebecca Skinner’s <a href="https://rebeccaskinner.net/posts/2021-06-06-nixifying-a-hakyll-blog.html">excellent blog
+post</a>
+and the hakyll part based mostly on the default template and some of the
+official tutorials. However, a few contributions are my own. The largest of
+which is the projects setup. Currently I only have two projects hosted here, but
+the way I’ve set it up it will be dead simple to add more.</p>
+<p>For the complete code discussed here, see the <a href="https://github.com/ElderEphemera/elderephemera.github.io/tree/57b6ccb0bcc51cab90dcdf82f865d1d2b19b2acd">GitHub
+repository</a>.</p>
+<h2 id="the-plan">The Plan</h2>
+<p>I had some static web projects that I wanted to host on the same site as my
+blog. Originally I was lazy and just copied the build result into the site
+repository. Obviously this was a huge pain though, so I was looking for a better
+solution. I wanted something that would take my projects from other repositories
+and automatically build them when the site is built, including the output in the
+site. Ideally there would also be a good way to access the projects for the main
+site too.</p>
+<h2 id="the-nix-side">The Nix Side</h2>
+<p>Once I was using Nix, the first step of this was obvious. As long as the
+projects were buildable with Nix, all that is needed to automatically fetch and
+build them is one of the fetchers like <code>fetchFromGitHub</code>. For each project,
+we’ll create a Nix file in “projects/” containing something like the following:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">repo</span> <span class="op">=</span> pkgs.fetchFromGitHub <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">owner</span> <span class="op">=</span> <span class="st">&quot;elderephemera&quot;</span><span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">repo</span> <span class="op">=</span> <span class="st">&quot;four&quot;</span><span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">rev</span> <span class="op">=</span> <span class="st">&quot;e11c35df3a84c0c7fee288e7ef6ca174f4a84dbb&quot;</span><span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">sha256</span> <span class="op">=</span> <span class="st">&quot;0did54cf6skvwspkcpisah6lh44yvywhccf6146kdm9q397pnz3h&quot;</span><span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="bu">import</span> repo<span class="op">)</span>.build.web</span></code></pre></div>
+<p>The next step then, is to put all of the projects together. Luckily Nixpkgs has
+a super handy builder called <code>linkFarm</code> that just combines several derivations
+into one. We’ll put this in “projects/default.nix”.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">projectNames</span> <span class="op">=</span> <span class="op">[</span> <span class="st">&quot;recipe-bookmarks&quot;</span> <span class="st">&quot;four&quot;</span> <span class="op">];</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">importProject</span> <span class="op">=</span> <span class="va">name</span><span class="op">:</span> <span class="bu">import</span> <span class="op">(</span><span class="ss">./.</span> <span class="op">+</span> <span class="st">&quot;/</span><span class="sc">${</span>name<span class="sc">}</span><span class="st">.nix&quot;</span><span class="op">);</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">projects</span> <span class="op">=</span> <span class="bu">map</span> <span class="op">(</span><span class="va">name</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">inherit</span> name<span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">path</span> <span class="op">=</span> importProject name<span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">})</span> projectNames<span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span> pkgs.linkFarm <span class="st">&quot;elderephemera.github.io/projects&quot;</span> projects</span></code></pre></div>
+<p>All that’s left for the Nix part is excluding the actual “projects/” folder from
+the source of the “nix/” folder and copying over the generated files in with the
+source. All that’s needed for this is adding a single line to the
+<code>gitignoreSourcePure</code> call and one more line in <code>buildPhase</code>.</p>
+<div class="collapsable">
+<input type="checkbox" class="collapse" />
+<div class="sourceCode" id="cb3"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">projects</span> <span class="op">=</span> <span class="bu">import</span> <span class="ss">./projects</span> <span class="op">{</span> <span class="kw">inherit</span> pkgs<span class="op">;</span> <span class="op">};</span> <span class="co"># Import projects/default.nix</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">site</span> <span class="op">=</span> pkgs.stdenv.mkDerivation <span class="op">{</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">src</span> <span class="op">=</span> pkgs.nix<span class="op">-</span>gitignore.gitignoreSourcePure <span class="op">[</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      ...</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;projects&quot;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">]</span> <span class="ss">./.</span><span class="op">;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">buildPhase</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="st">      cp -r </span><span class="sc">${</span>projects<span class="sc">}</span><span class="st"> projects # Copy projects output into src/projects</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="st">      </span><span class="sc">${</span>builder<span class="sc">}</span><span class="st">/bin/build-site build</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    ...</span></code></pre></div>
+</div>
+<h2 id="hakyll-time">Hakyll Time</h2>
+<p>With Nix doing all the heavy lifting the Hakyll side is really simple. In fact
+from the perspective of the site builder, the project files are just ordinary
+files in the source tree so all we need to simply host them is a rule that
+copies them over verbatim.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> hakyll <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  match <span class="st">&quot;projects/**&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    route   idRoute</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    compile copyFileCompiler</span></code></pre></div>
+<p>Simple as that!</p>
+<h2 id="the-projects-page">The Projects Page</h2>
+<p>So now the projects are hosted on the site, but there’s still a problem. There’s
+no way to get to them! We need a projects page. While we’re at it, let’s make it
+spiffy with links to GitHub and descriptions of each project. Again, we’ll
+figure out the Nix step first so that we will know precisely what the Hakyll
+step has to do.</p>
+<p>I wanted to keep all the configuration for each project in the
+“projects/foo.nix” file. Originally, I just had a short description for each
+project, but I decided I also wanted proper external links and proper titles
+(instead of just re-using the name of the Nix file). Here’s what I wound up
+with:</p>
+<div class="collapsable">
+<input type="checkbox" class="collapse" />
+<div class="sourceCode" id="cb5"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">repo</span> <span class="op">=</span> pkgs.fetchFromGitHub <span class="op">{</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">owner</span> <span class="op">=</span> <span class="st">&quot;elderephemera&quot;</span><span class="op">;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">repo</span> <span class="op">=</span> <span class="st">&quot;four&quot;</span><span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">rev</span> <span class="op">=</span> <span class="st">&quot;e11c35df3a84c0c7fee288e7ef6ca174f4a84dbb&quot;</span><span class="op">;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">sha256</span> <span class="op">=</span> <span class="st">&quot;0did54cf6skvwspkcpisah6lh44yvywhccf6146kdm9q397pnz3h&quot;</span><span class="op">;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span> <span class="op">{</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;four&quot;</span><span class="op">;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="va">path</span> <span class="op">=</span> <span class="op">(</span><span class="bu">import</span> repo<span class="op">)</span>.build.web<span class="op">;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="va">info</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">title</span> <span class="op">=</span> <span class="st">&quot;Four&quot;</span><span class="op">;</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">link</span> <span class="op">=</span> <span class="st">&quot;four/index.html&quot;</span><span class="op">;</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span> <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="st">      Something approaching a 2048-esque puzzle game. But it doesn't quite</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="st">      achieve the &quot;puzzle&quot; or even the &quot;game&quot; part. Originally created for the</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="st">      &lt;a href=&quot;https://itch.io/jam/not-a-game-jam-game-jam&quot;&gt;Not A Game Jam Game</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="st">      Jam&lt;/a&gt;.</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="st">    ''</span><span class="op">;</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="va">badges</span> <span class="op">=</span> <span class="op">[</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      <span class="op">{</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;GitHub&quot;</span><span class="op">;</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">link</span> <span class="op">=</span> <span class="st">&quot;https://github.com/ElderEphemera/four&quot;</span><span class="op">;</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">image</span> <span class="op">=</span> <span class="st">&quot;GitHub-Mark-Light-32px.png&quot;</span><span class="op">;</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>      <span class="op">{</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;itch.io&quot;</span><span class="op">;</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        <span class="va">link</span> <span class="op">=</span> <span class="st">&quot;https://elderephemera.itch.io/four&quot;</span><span class="op">;</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">image</span> <span class="op">=</span> <span class="st">&quot;itchio-textless-white.svg&quot;</span><span class="op">;</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="op">];</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<p>Now, in the “projects/default.nix” derivations we need to generate some kind of
+file for the site builder to read. I chose to use JSON for this just because
+it’s already supported by Haskell (through aeson) and Nix (with
+<code>builtins.toJSON</code>). Initially, I had planned to use YAML with Hakyll’s built-in
+metadata header feature, but it turns out it only supports a subset of YAML and
+doesn’t work at all for nested data.</p>
+<p>The final version of “projects/default.nix” ended up looking like this:</p>
+<div class="collapsable">
+<input type="checkbox" class="collapse" />
+<div class="sourceCode" id="cb6"><pre class="sourceCode nix"><code class="sourceCode nix"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> <span class="va">pkgs</span> <span class="op">?</span> <span class="bu">import</span> &lt;nixpkgs&gt; <span class="op">{}</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>:</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="va">projectNames</span> <span class="op">=</span> <span class="op">[</span> <span class="st">&quot;recipe-bookmarks&quot;</span> <span class="st">&quot;four&quot;</span> <span class="op">];</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">importProject</span> <span class="op">=</span> <span class="va">name</span><span class="op">:</span> <span class="bu">import</span> <span class="op">(</span><span class="ss">./.</span> <span class="op">+</span> <span class="st">&quot;/</span><span class="sc">${</span>name<span class="sc">}</span><span class="st">.nix&quot;</span><span class="op">)</span> <span class="op">{</span> <span class="kw">inherit</span> pkgs<span class="op">;</span> <span class="op">};</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">infoFile</span> <span class="op">=</span> <span class="va">info</span><span class="op">:</span> pkgs.writeText <span class="st">&quot;info.json&quot;</span> <span class="op">(</span><span class="bu">builtins</span>.toJSON info<span class="op">);</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="va">projects</span> <span class="op">=</span> <span class="bu">map</span> <span class="op">(</span><span class="va">name</span><span class="op">:</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="va">project</span> <span class="op">=</span> importProject name<span class="op">;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span> <span class="op">{</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>      <span class="kw">inherit</span> <span class="op">(</span>project<span class="op">)</span> name<span class="op">;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>      <span class="va">path</span> <span class="op">=</span> pkgs.linkFarm</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;elderephemera.github.io/projects/</span><span class="sc">${</span>project.name<span class="sc">}</span><span class="st">&quot;</span> <span class="op">[</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>          <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;info.json&quot;</span><span class="op">;</span> <span class="va">path</span> <span class="op">=</span> infoFile project.info<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>          <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;content&quot;</span><span class="op">;</span> <span class="va">path</span> <span class="op">=</span> project.path<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">];</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">})</span> projectNames<span class="op">;</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span> pkgs.linkFarm <span class="st">&quot;elderephemera.github.io/projects&quot;</span> projects</span></code></pre></div>
+</div>
+<p>Here we use a second <code>linkFarm</code> call to separate out the content of the project
+from the info file. We also used <code>writeText</code> to generate the JSON file. And
+that’s all we need to do to get our Nix builder to give the Hakyll builder
+everything it needs.</p>
+<h2 id="json-context">JSON Context</h2>
+<p>Now comes the hardest part. In order to get the data from the JSON file into a
+template we need to provide Hakyll with a <code>Context</code>. Which is defined as:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Context</span> a <span class="ot">=</span> <span class="dt">Context</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    {<span class="ot"> unContext ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">Item</span> a <span class="ot">-&gt;</span> <span class="dt">Compiler</span> <span class="dt">ContextField</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<p>While Hakyll has some functions for creating <code>Context</code>s, none of them really fit
+our purposes. So we’ll have to dig in and deal directly with this datatype. The
+<code>unContext</code> field takes three arguments, the requested field name, field
+arguments, and an <code>Item</code> containing the required data, in this case a <code>Value</code>
+from <code>aeson</code>. So we’ll start off our context like this.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">jsonCtx ::</span> <span class="dt">Context</span> <span class="dt">Value</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>jsonCtx <span class="ot">=</span> <span class="dt">Context</span> <span class="op">$</span> \name _ (<span class="dt">Item</span> _ meta) <span class="ot">-&gt;</span> <span class="op">...</span></span></code></pre></div>
+<p>We aren’t going to provide functions so, following the functions in
+<code>Hakyll.Web.Template.Context</code>, we just ignore the arguments. Likewise for the
+<code>itemIdentifier</code> part of the <code>Item</code>.</p>
+<p>Now we’ve run into a bit of a problem. If we want to provide full support for
+JSON contexts, we’ll need nested fields such as <code>"foo.bar.baz"</code>, but Hakyll
+doesn’t support anything like this. Luckily, it <em>is</em> somewhat liberal with the
+names of fields, so <code>$foo.bar.baz$</code> will parse just fine and be passed to our
+<code>Context</code> where we can break it into parts ourselves. A quick and dirty function
+to split on <code>'.'</code>s will do.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>splitName (<span class="ch">'.'</span><span class="op">:</span>cs) <span class="ot">=</span> <span class="st">&quot;&quot;</span> <span class="op">:</span> splitName cs</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>splitName (c<span class="op">:</span>cs) <span class="ot">=</span> <span class="kw">let</span> n<span class="op">:</span>ns <span class="ot">=</span> splitName cs <span class="kw">in</span> (c<span class="op">:</span>n)<span class="op">:</span>ns</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>splitName [] <span class="ot">=</span> [<span class="st">&quot;&quot;</span>]</span></code></pre></div>
+<p>Now that we’ve got the path to the value, we can use that to get the value
+itself with a function <code>getField :: Value -&gt; [String] -&gt; Maybe (Compiler ContextField)</code>.</p>
+<div class="collapsable">
+<input type="checkbox" class="collapse" />
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>getField (<span class="dt">Object</span> obj) (n<span class="op">:</span>ns)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Just</span> val <span class="ot">&lt;-</span> obj <span class="op">!?</span> T.pack n <span class="ot">=</span> getField val ns</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>getField (<span class="dt">Object</span> obj) [] <span class="ot">=</span> <span class="dt">Just</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">$</span> <span class="dt">ListField</span> jsonCtx <span class="op">&lt;$&gt;</span> <span class="fu">traverse</span> (makeItem <span class="op">.</span> <span class="fu">uncurry</span> object) (toList obj)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>getField (<span class="dt">Array</span> arr) [] <span class="ot">=</span> <span class="dt">Just</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">$</span> <span class="dt">ListField</span> jsonCtx <span class="op">&lt;$&gt;</span> <span class="fu">traverse</span> makeItem (toList arr)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>getField (<span class="dt">String</span> txt) [] <span class="ot">=</span> <span class="dt">Just</span> <span class="op">.</span> <span class="fu">pure</span> <span class="op">.</span> <span class="dt">StringField</span> <span class="op">$</span> T.unpack txt</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>getField (<span class="dt">Number</span> num) [] <span class="ot">=</span> <span class="dt">Just</span> <span class="op">.</span> <span class="fu">pure</span> <span class="op">.</span> <span class="dt">StringField</span> <span class="op">$</span> <span class="fu">show</span> num</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>getField (<span class="dt">Bool</span> <span class="dt">True</span>) [] <span class="ot">=</span> <span class="dt">Just</span> <span class="op">$</span> <span class="fu">pure</span> <span class="dt">EmptyField</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>getField (<span class="dt">Bool</span> <span class="dt">False</span>) [] <span class="ot">=</span> <span class="dt">Just</span> <span class="op">$</span> noResult <span class="st">&quot;Field is false&quot;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>getField <span class="dt">Null</span> [] <span class="ot">=</span> <span class="dt">Just</span> <span class="op">$</span> noResult <span class="st">&quot;Field is null&quot;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>getField _ _ <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>object key value <span class="ot">=</span> <span class="dt">Object</span> <span class="op">$</span> <span class="st">&quot;key&quot;</span> <span class="op">.=</span> key <span class="op">&lt;&gt;</span> <span class="st">&quot;value&quot;</span> <span class="op">.=</span> value </span></code></pre></div>
+</div>
+<p>There’s a lot going on with this function, but the recursive case is fairly
+simple, and most of the base cases are just replicating what the builtin
+contexts for booleans and lists and such do. One thing to note is that for
+object fields we treat them as lists of key-value pairs. This seems like the
+most sensible thing to do as it lets us use objects with Hakyll’s <code>$for(list)$</code>
+constructs.</p>
+<p>Finally, we have to display an error if the field was not found in the
+<code>Value</code>. Again mimicking Hakyll’s own contexts:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>failure json <span class="ot">=</span> noResult <span class="op">$</span> <span class="st">&quot;Tried JSON context &quot;</span> <span class="op">++</span> BS.unpack (encode json)</span></code></pre></div>
+<p>Putting it all together, we get:</p>
+<div class="collapsable">
+<input type="checkbox" class="collapse" />
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">jsonCtx ::</span> <span class="dt">Context</span> <span class="dt">Value</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>jsonCtx <span class="ot">=</span> <span class="dt">Context</span> <span class="op">$</span> \name _ (<span class="dt">Item</span> _ meta) <span class="ot">-&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  fromMaybe (failure meta) <span class="op">.</span> getField meta <span class="op">$</span> splitName name</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    getField (<span class="dt">Object</span> obj) (n<span class="op">:</span>ns)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> <span class="dt">Just</span> val <span class="ot">&lt;-</span> obj <span class="op">!?</span> T.pack n <span class="ot">=</span> getField val ns</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    getField (<span class="dt">Object</span> obj) [] <span class="ot">=</span> <span class="dt">Just</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">$</span> <span class="dt">ListField</span> jsonCtx <span class="op">&lt;$&gt;</span> <span class="fu">traverse</span> (makeItem <span class="op">.</span> <span class="fu">uncurry</span> object) (toList obj)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    getField (<span class="dt">Array</span> arr) [] <span class="ot">=</span> <span class="dt">Just</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>      <span class="op">$</span> <span class="dt">ListField</span> jsonCtx <span class="op">&lt;$&gt;</span> <span class="fu">traverse</span> makeItem (toList arr)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    getField (<span class="dt">String</span> txt) [] <span class="ot">=</span> <span class="dt">Just</span> <span class="op">.</span> <span class="fu">pure</span> <span class="op">.</span> <span class="dt">StringField</span> <span class="op">$</span> T.unpack txt</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    getField (<span class="dt">Number</span> num) [] <span class="ot">=</span> <span class="dt">Just</span> <span class="op">.</span> <span class="fu">pure</span> <span class="op">.</span> <span class="dt">StringField</span> <span class="op">$</span> <span class="fu">show</span> num</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    getField (<span class="dt">Bool</span> <span class="dt">True</span>) [] <span class="ot">=</span> <span class="dt">Just</span> <span class="op">$</span> <span class="fu">pure</span> <span class="dt">EmptyField</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    getField (<span class="dt">Bool</span> <span class="dt">False</span>) [] <span class="ot">=</span> <span class="dt">Just</span> <span class="op">$</span> noResult <span class="st">&quot;Field is false&quot;</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    getField <span class="dt">Null</span> [] <span class="ot">=</span> <span class="dt">Just</span> <span class="op">$</span> noResult <span class="st">&quot;Field is null&quot;</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    getField _ _ <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    object key value <span class="ot">=</span> <span class="dt">Object</span> <span class="op">$</span> <span class="st">&quot;key&quot;</span> <span class="op">.=</span> key <span class="op">&lt;&gt;</span> <span class="st">&quot;value&quot;</span> <span class="op">.=</span> value </span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    splitName (<span class="ch">'.'</span><span class="op">:</span>cs) <span class="ot">=</span> <span class="st">&quot;&quot;</span> <span class="op">:</span> splitName cs</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    splitName (c<span class="op">:</span>cs) <span class="ot">=</span> <span class="kw">let</span> n<span class="op">:</span>ns <span class="ot">=</span> splitName cs <span class="kw">in</span> (c<span class="op">:</span>n)<span class="op">:</span>ns</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    splitName [] <span class="ot">=</span> [<span class="st">&quot;&quot;</span>]</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    failure json <span class="ot">=</span> noResult <span class="op">$</span> <span class="st">&quot;Tried JSON context &quot;</span> <span class="op">++</span> BS.unpack (encode json)</span></code></pre></div>
+</div>
+<h2 id="the-template">The Template</h2>
+<p>Now the project page template. If you’re familiar with Hakyll templates there’s
+not too much going on here. My projects page template looks like this:</p>
+<div class="collapsable">
+<input type="checkbox" class="collapse" />
+<div class="sourceCode" id="cb13"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>title: Projects</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  Below is a list of my projects that are hosted on this site. For other</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  projects, check out <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;https://github.com/ElderEphemera&quot;</span><span class="dt">&gt;</span>my GitHub</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  page<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span>.</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">ul</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;projectlist&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  $for(projects)$</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">li</span><span class="dt">&gt;</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">&quot;project-header&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">h2</span><span class="ot"> class</span><span class="op">=</span><span class="st">&quot;project-name&quot;</span><span class="dt">&gt;&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;/projects/$link$&quot;</span><span class="dt">&gt;</span>$title$<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;&lt;/</span><span class="kw">h2</span><span class="dt">&gt;</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">&quot;project-badges&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>          $for(badges)$</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;$link$&quot;</span><span class="ot"> title</span><span class="op">=</span><span class="st">&quot;$name$&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>              <span class="dt">&lt;</span><span class="kw">img</span><span class="ot"> src</span><span class="op">=</span><span class="st">&quot;/images/$image$&quot;</span><span class="ot"> alt</span><span class="op">=</span><span class="st">&quot;$name$&quot;</span><span class="ot"> height</span><span class="op">=</span><span class="st">&quot;32&quot;</span><span class="dt">/&gt;</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>          $endfor$</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">p</span><span class="ot"> class</span><span class="op">=</span><span class="st">&quot;project-description&quot;</span><span class="dt">&gt;</span>$description$<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">li</span><span class="dt">&gt;</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  $endfor$</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">ul</span><span class="dt">&gt;</span></span></code></pre></div>
+</div>
+<p>The difficult part is getting all the Hakyll <code>Rules</code> right. We’ll replace our
+simple <code>match "projects/**"</code> rule from earlier with 3 new rules.</p>
+<div class="collapsable">
+<input type="checkbox" class="collapse" />
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> hakyll <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  match <span class="st">&quot;projects.html&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    route   idRoute</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    compile <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="kw">let</span> projects <span class="ot">=</span> <span class="fu">traverse</span> (<span class="fu">either</span> <span class="fu">fail</span> <span class="fu">pure</span> <span class="op">.</span> <span class="fu">traverse</span> eitherDecode)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>            <span class="op">=&lt;&lt;</span> loadAll <span class="st">&quot;projects/*/info.json&quot;</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>          projectsContext <span class="ot">=</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>               listField <span class="st">&quot;projects&quot;</span> jsonCtx projects</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>            <span class="op">&lt;&gt;</span> defaultContext</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>      getResourceBody</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> applyAsTemplate projectsContext</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> loadAndApplyTemplate <span class="st">&quot;templates/default.html&quot;</span> projectsContext</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>        <span class="op">&gt;&gt;=</span> relativizeUrls</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  match <span class="st">&quot;projects/*/info.json&quot;</span> <span class="op">$</span> compile getResourceLBS</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  match <span class="st">&quot;projects/*/content/**&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    route   <span class="op">$</span> gsubRoute <span class="st">&quot;content/&quot;</span> <span class="fu">mempty</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    compile copyFileCompiler</span></code></pre></div>
+</div>
+<p>Even though the <code>info.json</code> files don’t directly correspond to a file, we still
+need a rule for them so that Hakyll can track the dependencies. It would be
+cleaner if the decoding step could be put into that rule, but <code>Value</code> does not
+have the instances Hakyll needs to cache it and the multitude of orphan
+instances just aren’t worth it. So instead we shove all the decoding bits
+(<code>traverse (either fail pure . traverse eitherDecode)</code>) into the <code>projects.html</code>
+rule.</p>
+<p>One last quick thing to notice is that we use <code>gsubRoute "content/" mempty</code> to
+simplify the paths of the actual project files.</p>
+<h2 id="wrap-up">Wrap up</h2>
+<p>All in all, I’m very happy with the way things turned out. The projects page is
+clean and updating or adding projects is a breeze. Using Nix also made building
+and deploying the site with GitHub actions much easier. One downside is that, in
+using Nix, we end up throwing away Hakyll’s caching and making some of it’s
+other features harder to use. I think this is a fair trade off though, for
+everything Nix brings to the table. You can check out the finished product
+<a href="../../projects">here</a>.</p>
+</div>
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

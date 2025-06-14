@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style type="text/css">
+      body {
+        background-color: black;
+	margin: 0;
+      }
+      #canvas {
+        position: absolute;
+        top:0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin:auto;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    <script type='text/javascript'>
+      var Module = { canvas: (function() { return document.getElementById('canvas'); })() };
+    </script>
+    <script src="assets.intro.txt.js"></script>
+    <script src="assets.easel.glb.js"></script>
+    <script src="assets.pole.glb.js"></script>
+    <script src="assets.exclamation.jpg.js"></script>
+    <script src="assets.exclamation.glb.js"></script>
+    <script src="assets.cd.glb.js"></script>
+    <script src="assets.waves.jpg.js"></script>
+    <script src="assets.jukebox.glb.js"></script>
+    <script src="assets.songs.Call_Me.mp3.js"></script>
+    <script src="assets.songs.Thunderstruck.mp3.js"></script>
+    <script src="assets.songs.House_Of_The_Rising_Sun.mp3.js"></script>
+    <script src="assets.songs.Another_Brick_In_The_Wall.mp3.js"></script>
+    <script src="assets.songs.Hold_The_Line.mp3.js"></script>
+    <script src="assets.songs.Hotel_California.mp3.js"></script>
+    <script src="assets.songs.Space_Oddity.mp3.js"></script>
+    <script src="assets.songs.Sweet_Home_Alabama.mp3.js"></script>
+    <script src="assets.songs.You_Spin_Me_Round.mp3.js"></script>
+    <script src="assets.songs.Hurts_So_Good.mp3.js"></script>
+    <script src="assets.songs.Push_It.mp3.js"></script>
+    <script src="assets.songs.Losing_My_Religion.mp3.js"></script>
+    <script src="assets.songs.Master_of_Puppets.mp3.js"></script>
+    <script src="assets.songs.Tainted_Love.mp3.js"></script>
+    <script src="assets.songs.Dream_On.mp3.js"></script>
+    <script src="assets.songs.Sailor_Moon.mp3.js"></script>
+    <script src="assets.songs.Don't_Stop_Believing.mp3.js"></script>
+    <script src="assets.songs.Barracuda.mp3.js"></script>
+    <script src="assets.songs.Karma_Chameleon.mp3.js"></script>
+    <script src="assets.songs.Road_To_Nowhere.mp3.js"></script>
+    <script src="assets.songs.We're_Not_Gonna_Take_It.mp3.js"></script>
+    <script src="assets.songs.Don't_You_Want_Me.mp3.js"></script>
+    <script src="assets.songs.Video_Killed_The_Radio_Star.mp3.js"></script>
+    <script src="assets.songs.I_Love_Rock_n_Roll.mp3.js"></script>
+    <script src="assets.songs.Electric_Avenue.mp3.js"></script>
+    <script src="assets.songs.Godzilla.mp3.js"></script>
+    <script src="assets.songs.I'm_Still_Standing.mp3.js"></script>
+    <script src="assets.songs.Another_One_Bites_The_Dust.mp3.js"></script>
+    <script src="assets.songs.Tank.mp3.js"></script>
+    <script src="assets.songs.Miami_2017.mp3.js"></script>
+    <script src="assets.songs.What's_Love_Got_To_Do_With_It.mp3.js"></script>
+    <script src="assets.songs.We_Built_This_City.mp3.js"></script>
+    <script src="assets.songs.Take_On_Me.mp3.js"></script>
+    <script src="assets.songs.Carry_On_My_Wayward_Son.mp3.js"></script>
+    <script src="assets.songs.He_Stopped_Loving_Her_Today.mp3.js"></script>
+    <script src="assets.songs.Super_Freak.mp3.js"></script>
+    <script src="assets.songs.Have_You_Ever_Seen_The_Rain.mp3.js"></script>
+    <script src="assets.songs.Canyon.mp3.js"></script>
+    <script src="assets.songs.Paint_It_Black.mp3.js"></script>
+    <script src="assets.songs.Ballroom_Blitz.mp3.js"></script>
+    <script src="assets.font.ttf.js"></script>
+    <script src="assets.sky.jpg.js"></script>
+    <script src="assets.stickers.TMNT_Donatello.jpg.js"></script>
+    <script src="assets.stickers.Ghostbusters.png.js"></script>
+    <script src="assets.stickers.Bugs_Bunny.gif.js"></script>
+    <script src="assets.stickers.Hello_Kitty.jpg.js"></script>
+    <script src="assets.stickers.Controlers_Background.jpg.js"></script>
+    <script src="assets.stickers.TMNT_Raphael.jpg.js"></script>
+    <script src="assets.stickers.Mothra.gif.js"></script>
+    <script src="assets.stickers.Pegasus.png.js"></script>
+    <script src="assets.stickers.Stars_Background.jpg.js"></script>
+    <script src="assets.stickers.Fred_Flinstone.png.js"></script>
+    <script src="assets.stickers.Alf.png.js"></script>
+    <script src="assets.stickers.Batman.png.js"></script>
+    <script src="assets.stickers.Godzilla_Stare.gif.js"></script>
+    <script src="assets.stickers.He_Man.jpg.js"></script>
+    <script src="assets.stickers.Hoth.png.js"></script>
+    <script src="assets.stickers.Al_Pacino.png.js"></script>
+    <script src="assets.stickers.Skeletor.jpg.js"></script>
+    <script src="assets.stickers.Thought_Balloon.png.js"></script>
+    <script src="assets.stickers.Amiga_2000.png.js"></script>
+    <script src="assets.stickers.Frame.png.js"></script>
+    <script src="assets.stickers.Godzilla_Breath.gif.js"></script>
+    <script src="assets.stickers.Han_Solo.png.js"></script>
+    <script src="assets.stickers.Shaggy.png.js"></script>
+    <script src="assets.stickers.Ewok.gif.js"></script>
+    <script src="assets.stickers.Terminator.png.js"></script>
+    <script src="assets.stickers.Luke.jpg.js"></script>
+    <script src="assets.stickers.TMNT.jpg.js"></script>
+    <script src="assets.stickers.Astronaut.png.js"></script>
+    <script src="assets.stickers.Indiana_Jones.jpg.js"></script>
+    <script src="assets.stickers.Beholder.png.js"></script>
+    <script src="assets.stickers.TMNT_Michaelangelo.jpg.js"></script>
+    <script src="assets.stickers.Hearts_Background.jpg.js"></script>
+    <script src="assets.stickers.Sailor_Moon.png.js"></script>
+    <script src="assets.stickers.Ripley.jpg.js"></script>
+    <script src="assets.stickers.Heart.gif.js"></script>
+    <script src="assets.stickers.Horses.png.js"></script>
+    <script src="assets.stickers.Dragon.png.js"></script>
+    <script src="assets.stickers.Gold_Star.gif.js"></script>
+    <script src="assets.stickers.Yoda.gif.js"></script>
+    <script src="assets.stickers.Frog_PC.png.js"></script>
+    <script src="assets.stickers.Ferrari_GTO.gif.js"></script>
+    <script src="assets.stickers.Mouse.gif.js"></script>
+    <script src="assets.stickers.TMNT_Leonardo.jpg.js"></script>
+    <script src="assets.stickers.Autobot.png.js"></script>
+    <script src="assets.stickers.Leia.png.js"></script>
+    <script src="assets.stickers.Buzz_Aldrin.png.js"></script>
+    <script src="assets.stickers.Polar_Bear.gif.js"></script>
+    <script src="assets.stickers.Scooby.png.js"></script>
+    <script src="assets.stickers.Thundercats.jpg.js"></script>
+    <script src="assets.stickers.Heart_Arrow.gif.js"></script>
+    <script src="assets.reel.jpg.js"></script>
+    <script src="assets.controls.key_a.gif.js"></script>
+    <script src="assets.controls.key_h.gif.js"></script>
+    <script src="assets.controls.mouse_0.png.js"></script>
+    <script src="assets.controls.key_down.gif.js"></script>
+    <script src="assets.controls.key_space.gif.js"></script>
+    <script src="assets.controls.key_s.gif.js"></script>
+    <script src="assets.controls.mouse_2.png.js"></script>
+    <script src="assets.controls.key_q.gif.js"></script>
+    <script src="assets.controls.key_up.gif.js"></script>
+    <script src="assets.controls.key_d.gif.js"></script>
+    <script src="assets.controls.key_e.gif.js"></script>
+    <script src="assets.controls.key_w.gif.js"></script>
+    <script src="assets.controls.mouse_1.png.js"></script>
+    <script src="assets.controls.key_enter.gif.js"></script>
+    <script src="assets.ship.glb.js"></script>
+    <script src="assets.canvas.glb.js"></script>
+    <script src="assets.line.jpg.js"></script>
+    <script src="assets.bobber.glb.js"></script>
+    <script src="assets.manifest.json.js"></script>
+    <script src="assets.metal.jpg.js"></script>
+    <script src="assets.sail.jpg.js"></script>
+    <script src="assets.ladder.glb.js"></script>
+    <script src="assets.wood.jpg.js"></script>
+    <script src="assets.ocean.mp3.js"></script>
+    <script src="assets.hooked.mp3.js"></script>
+    <script src="amigalite-ark.js"></script>
+  </body>
+</html>
