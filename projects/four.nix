@@ -24,7 +24,7 @@ in {
       {
         name = "GitHub";
         link = "https://github.com/ElderEphemera/four";
-        image = "GitHub-Mark-Light-32px.png";
+        image = "github-mark-white.svg";
       }
       {
         name = "itch.io";
