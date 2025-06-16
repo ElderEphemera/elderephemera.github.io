@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ElderEphemera - Making a Tiny Shmup With Parsec</title>
+        <link rel="stylesheet" href="https://code.cdn.mozilla.net/fonts/fira.css">
+        <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../../">ElderEphemera</a>
+            </div>
+            <div id="navigation">
+                <a href="../../">Home</a>
+                <a href="../../about">About</a>
+		<a href="../../projects">Projects</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1 id="title">Making a Tiny Shmup With Parsec</h1>
+            <div><div class="info">
+    Posted on March 31, 2023
+    
+</div>
+
+<p>I recently made a few games for the <a href="https://github.com/haskell-game/tiny-games-hs">Haskell Tiny Game Jam</a> and thought I’d share some of my experience with one of them because it was really fun and the way it turned out is completely different from what I would have done without the constraints of the contest.</p>
+<img src="../../images/shmupemup.gif" class="freezeframe " style="width:100%" />
+<script src="https://unpkg.com/freezeframe/dist/freezeframe.min.js"></script>
+<script>
+  window.onload = (event) =>
+    new Freezeframe(".freezeframe", {trigger: "click", overlay: true})
+</script>
+<p>Unfortunately, due to school and other things, I didn’t get this post up before the end of the contest and then it sat on the back burner for a bit, but I’m posting it now! There were also some last-minute character savings I found while writing this that allowed me to add another feature I had had in mind, so the code here isn’t 100% representative of the final code, but it’s illustrative enough for the purpose of this post.</p>
+<p>I’m also happy to be able to write here that shmupemup, the game in discussion, won in its category! Tying with space-invaders by meooow25.</p>
+<p>You can see the code and documentation <a href="https://github.com/haskell-game/tiny-games-hs/tree/main/default/shmupemup">here in the game jam repo</a>.</p>
+<h2 id="the-game-jam">The Game Jam</h2>
+<p>If you’re unfamiliar, the Haskell Tiny Game Jam was a contest that ran through February, in which participants must create playable games in 10 lines of 80 characters or less of Haskell. There are four categories, two of which are relevant to this post:</p>
+<ul>
+<li><code>base-10-80</code>: Imports are allowed, but only from the <code>base</code> package.</li>
+<li><code>default-10-80</code>: Imports are allowed from any package distributed with GHC, i.e. boot packages. Additionally, a second <code>Import.hs</code> file is allowed which is not limited in length, but can only contain imports and re-exports.</li>
+</ul>
+<p>Although it is a very interesting topic, this post isn’t really about squeezing a game to fit such limiting constraints, but rather a specific technique that came out of that process.</p>
+<h2 id="starting">Starting</h2>
+<p>For my third game, I decided I wanted to make a side-scrolling shmup. Before I started writing any code, I was conceptualizing the implementation as something like a cellular automaton. Characters representing the player, shots, and enemies would affect their neighbors according to a set of rules. To make it an actual controllable game, some rules would be enabled or disabled based on user input.</p>
+<p>When I actually started coding, it made sense to implement this as two functions, one for horizontal interactions, and one for vertical interactions. Then, with the game state stored as a list of lines, the update could be done with something like <code>transpose . map (vertical input) . transpose . map (horizontal input)</code>. These two functions ended up looking something like this:</p>
+<div class="collapsable">
+<input type="checkbox" class="collapse" />
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>horizontal <span class="ch">'a'</span> (<span class="ch">' '</span><span class="op">:</span><span class="ch">'&gt;'</span><span class="op">:</span>rest) <span class="ot">=</span> <span class="st">&quot;&gt; &quot;</span> <span class="op">++</span> horizontal <span class="ch">'a'</span> rest</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>horizontal <span class="ch">'d'</span> (<span class="ch">'&gt;'</span><span class="op">:</span><span class="ch">' '</span><span class="op">:</span>rest) <span class="ot">=</span> <span class="st">&quot; &gt;&quot;</span> <span class="op">++</span> horizontal <span class="ch">'d'</span> rest</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>horizontal <span class="ch">' '</span> (<span class="ch">'&gt;'</span><span class="op">:</span><span class="ch">' '</span><span class="op">:</span>rest) <span class="ot">=</span> <span class="st">&quot;&gt;-&quot;</span> <span class="op">++</span> horizontal <span class="ch">' '</span> rest</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>horizontal key (<span class="ch">'-'</span><span class="op">:</span><span class="ch">' '</span><span class="op">:</span>e<span class="op">:</span>rest) <span class="op">|</span> enemy e <span class="ot">=</span> <span class="st">&quot; X &quot;</span> <span class="op">++</span> horizontal key rest</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>horizontal key (<span class="ch">' '</span><span class="op">:</span>e<span class="op">:</span>rest) <span class="op">|</span> enemy e <span class="ot">=</span> e <span class="op">:</span> <span class="ch">' '</span> <span class="op">:</span> horizontal key rest</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>horizontal key (<span class="ch">'-'</span><span class="op">:</span>e<span class="op">:</span>rest) <span class="op">|</span> enemy e <span class="ot">=</span> <span class="st">&quot; X&quot;</span> <span class="op">++</span> horizontal key rest</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>horizontal key (<span class="ch">'&gt;'</span><span class="op">:</span>e<span class="op">:</span>rest) <span class="op">|</span> enemy e <span class="ot">=</span> <span class="st">&quot;X &quot;</span> <span class="op">++</span> horizontal key rest</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>horizontal key (e<span class="op">:</span>rest) <span class="op">|</span> enemy e <span class="ot">=</span> <span class="ch">' '</span> <span class="op">:</span> horizontal key rest</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>horizontal key (<span class="ch">'-'</span><span class="op">:</span>x<span class="op">:</span>rest) <span class="ot">=</span> <span class="st">&quot; -&quot;</span> <span class="op">++</span> horizontal key rest</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>horizontal key (x<span class="op">:</span>rest) <span class="ot">=</span> x <span class="op">:</span> horizontal key rest</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>vertical <span class="ch">'s'</span> (<span class="ch">'&gt;'</span><span class="op">:</span><span class="ch">' '</span><span class="op">:</span>rest) <span class="ot">=</span> <span class="st">&quot; &gt;&quot;</span> <span class="op">++</span> vertical <span class="ch">'s'</span> rest</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>vertical <span class="ch">'w'</span> (<span class="ch">' '</span><span class="op">:</span><span class="ch">'&gt;'</span><span class="op">:</span>rest) <span class="ot">=</span> <span class="st">&quot;&gt; &quot;</span> <span class="op">++</span> vertical <span class="ch">'w'</span> rest</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>vertical key (<span class="ch">'X'</span><span class="op">:</span>rest) <span class="ot">=</span> <span class="ch">' '</span> <span class="op">:</span> vertical key rest</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>vertical key (<span class="ch">'/'</span><span class="op">:</span><span class="ch">'&gt;'</span><span class="op">:</span>rest) <span class="ot">=</span> <span class="st">&quot; X&quot;</span> <span class="op">++</span> vertical key rest</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>vertical key (<span class="ch">'/'</span><span class="op">:</span>_<span class="op">:</span>rest) <span class="ot">=</span> <span class="st">&quot; /&quot;</span> <span class="op">++</span> vertical key rest</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>vertical key <span class="st">&quot;/&quot;</span> <span class="ot">=</span> <span class="st">&quot;\\&quot;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>vertical key (<span class="ch">'&gt;'</span><span class="op">:</span><span class="ch">'\\'</span><span class="op">:</span>rest) <span class="ot">=</span> <span class="st">&quot;X &quot;</span> <span class="op">++</span> vertical key rest</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>vertical key (_<span class="op">:</span><span class="ch">'\\'</span><span class="op">:</span>rest) <span class="ot">=</span> <span class="st">&quot;\\ &quot;</span> <span class="op">++</span> vertical key rest</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>vertical key (<span class="ch">'\\'</span><span class="op">:</span>rest) <span class="ot">=</span> <span class="ch">'/'</span> <span class="op">:</span> vertical key rest</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>vertical key (x<span class="op">:</span>rest) <span class="ot">=</span> x <span class="op">:</span> vertical key rest</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>enemy <span class="ot">=</span> (<span class="ot">`elem`</span> <span class="st">&quot;@\\/&quot;</span>)</span></code></pre></div>
+</div>
+<p>This doesn’t look nearly as much like a cellular automaton as it did in my head, but it worked. Except that after the first pass of minimizing, my code was still about fifteen lines long. I probably could have saved a line or <em>maybe</em> even two with a bunch of little tricks, but there was no way I could make it just 10 lines without something more.</p>
+<h2 id="moving-categories">Moving Categories</h2>
+<p>One option would be to change categories. I had originally been using the rules for the “base” category. Switching to “default” would allow me to use an <code>Import.hs</code> to save on import space and also get rid of a re-implementation of <code>traverse</code>.</p>
+<p>But even with these savings, I still couldn’t get it under 800 characters. So I started randomly scrolling through the <a href="https://downloads.haskell.org/ghc/latest/docs/libraries/index.html">boot libraries</a> until Parsec caught my eye. I realized that what I had was not a cellular automaton. It was a string rewriting system. Equipped with Parsec and this new perspective, I wrote something like this:</p>
+<div class="collapsable">
+<input type="checkbox" class="collapse" />
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Renamed: b</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>runParser parser <span class="ot">=</span> fold <span class="op">.</span> fold <span class="op">.</span> parse (many parser) <span class="st">&quot;&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- Renamed: f</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>enemy <span class="ot">=</span> oneOf <span class="st">&quot;{[@\\/&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- Renamed: h</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>horizontal <span class="ch">'a'</span> <span class="ot">=</span> try (string <span class="st">&quot; &gt;&quot;</span> <span class="op">$&gt;</span> <span class="st">&quot;&gt; &quot;</span>) <span class="op">&lt;|&gt;</span> horizontal <span class="ch">'a'</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>horizontal <span class="ch">'d'</span> <span class="ot">=</span> try (string <span class="st">&quot;&gt; &quot;</span> <span class="op">$&gt;</span> <span class="st">&quot; &gt;&quot;</span>) <span class="op">&lt;|&gt;</span> horizontal <span class="ch">'d'</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>horizontal <span class="ch">' '</span> <span class="ot">=</span> try (string <span class="st">&quot;&gt; &quot;</span> <span class="op">$&gt;</span> <span class="st">&quot;&gt;-&quot;</span>) <span class="op">&lt;|&gt;</span> horizontal <span class="ch">' '</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>horizontal _ <span class="ot">=</span> asum <span class="op">$</span> <span class="fu">map</span> try</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  [ string <span class="st">&quot;- &quot;</span> <span class="op">*&gt;</span> enemy <span class="op">$&gt;</span> <span class="st">&quot; X &quot;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  , (<span class="op">:</span><span class="st">&quot; &quot;</span>) <span class="op">&lt;$&gt;</span> (string <span class="st">&quot; &quot;</span> <span class="op">*&gt;</span> enemy)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  , string <span class="st">&quot;-&quot;</span> <span class="op">*&gt;</span> enemy <span class="op">$&gt;</span> <span class="st">&quot; X&quot;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  , string <span class="st">&quot;&gt;&quot;</span> <span class="op">*&gt;</span> enemy <span class="op">$&gt;</span> <span class="st">&quot;X &quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  , enemy <span class="op">$&gt;</span> <span class="st">&quot; &quot;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  , string <span class="st">&quot;-&quot;</span> <span class="op">*&gt;</span> anyChar <span class="op">$&gt;</span> <span class="st">&quot; -&quot;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  , (<span class="op">:</span>[]) <span class="op">&lt;$&gt;</span> anyChar</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  ]</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- Renamed: v</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>vertical <span class="ch">'s'</span> <span class="ot">=</span> try (string <span class="st">&quot;&gt; &quot;</span> <span class="op">$&gt;</span> <span class="st">&quot; &gt;&quot;</span>) <span class="op">&lt;|&gt;</span> vertical <span class="ch">'s'</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>vertical <span class="ch">'w'</span> <span class="ot">=</span> try (string <span class="st">&quot; &gt;&quot;</span> <span class="op">$&gt;</span> <span class="st">&quot;&gt; &quot;</span>) <span class="op">&lt;|&gt;</span> vertical <span class="ch">'w'</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>vertical _ <span class="ot">=</span> asum <span class="op">$</span> <span class="fu">map</span> try</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  [ string <span class="st">&quot;X&quot;</span> <span class="op">$&gt;</span> <span class="st">&quot; &quot;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  , string <span class="st">&quot;/&gt;&quot;</span> <span class="op">$&gt;</span> <span class="st">&quot; X&quot;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  , string <span class="st">&quot;/&quot;</span> <span class="op">*&gt;</span> anyChar <span class="op">$&gt;</span> <span class="st">&quot; /&quot;</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  , string <span class="st">&quot;/&quot;</span> <span class="op">*&gt;</span> eof <span class="op">$&gt;</span> <span class="st">&quot;\\&quot;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  , string <span class="st">&quot;&gt;\\&quot;</span> <span class="op">$&gt;</span> <span class="st">&quot;X &quot;</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  , anyChar <span class="op">*&gt;</span> string <span class="st">&quot;\\&quot;</span> <span class="op">$&gt;</span> <span class="st">&quot;\\ &quot;</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  , string <span class="st">&quot;\\&quot;</span> <span class="op">$&gt;</span> <span class="st">&quot;/&quot;</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  , (<span class="op">:</span>[]) <span class="op">&lt;$&gt;</span> anyChar</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  ]</span></code></pre></div>
+</div>
+<p>And after some effort minimizing, this aproach got the game under ten lines! I even had some extra room for more enemies and a score counter.</p>
+<h2 id="domain-specific-combinators">Domain-Specific Combinators</h2>
+<p>I don’t want to focus much on the minimization part here, but I will mention that I created some ad hoc combinators to DRY the rules up a bit. Specifically, because almost half of the rules simply replace a string with another string, abstracting that out seems natural and It would’ve been good even without the size requirement.</p>
+<p>Here’s the final version of the parsers, unminified and with commentary and type signatures:</p>
+<div class="collapsable">
+<input type="checkbox" class="collapse" />
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Parser</span> <span class="ot">=</span> <span class="dt">Parsec</span> <span class="dt">String</span> () <span class="dt">String</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- Renamed: b</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ot">runParser ::</span> <span class="dt">Parser</span> <span class="ot">-&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>runParser parser <span class="ot">=</span> fold <span class="op">.</span> fold <span class="op">.</span> parse (many parser) <span class="st">&quot;&quot;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- Replace occurrences of the string x with y. This is a pretty fundamental</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- concept for this approach. A version that takes a parser as the first</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- argument would be useful as well, but here we manage to get away with the</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- pattern `from --&gt; to &lt;* after` which ends up equivalent to `(string from *&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- after) $&gt; to` meaning it matches the string `from` followed by something</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- accepted by `after` and replaces that with `to`.</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- Renamed: %</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="ot">(--&gt;) ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>x <span class="op">--&gt;</span> y <span class="ot">=</span> string x <span class="op">$&gt;</span> y</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- This is used for the input handling recursive cases. It's pretty specific to</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">-- this game. Even in a non-constrained version of the game, this wouldn't be as</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">-- useful; it would make more sense to split the rules into input handling and</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- not, with the former falling through to the latter. Combining these into one</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- recursive parser ends up saving a few characters though and all savings must</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">-- be taken. Still though, in a more thought-out version of this technique,</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">-- something to deal with input would be good, perhaps by equipping the parser</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co">-- type with the ability to read the input and having a parser combinator that</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co">-- succeeds iff the input matches some condition.</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="ot">(#) ::</span> <span class="dt">Parser</span> <span class="ot">-&gt;</span> (<span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span>) <span class="ot">-&gt;</span> <span class="dt">Parser</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>p <span class="op">#</span> f <span class="ot">=</span> try p <span class="op">&lt;|&gt;</span> f <span class="ch">'#'</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co">-- Renamed: f</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>enemy <span class="ot">=</span> oneOf <span class="st">&quot;{[@\\/&quot;</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co">-- Renamed: h</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="ot">horizontal ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>horizontal <span class="ch">'a'</span> <span class="ot">=</span> <span class="st">&quot; &gt;&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot;&gt; &quot;</span> <span class="op">#</span> horizontal <span class="co">-- Move the player left</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>horizontal <span class="ch">'d'</span> <span class="ot">=</span> <span class="st">&quot;&gt; &quot;</span> <span class="op">--&gt;</span> <span class="st">&quot; &gt;&quot;</span> <span class="op">#</span> horizontal <span class="co">-- Move the player right</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>horizontal <span class="ch">' '</span> <span class="ot">=</span> <span class="st">&quot;&gt; &quot;</span> <span class="op">--&gt;</span> <span class="st">&quot;&gt;-&quot;</span> <span class="op">#</span> horizontal <span class="co">-- Fire laser</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>horizontal _ <span class="ot">=</span> asum <span class="op">$</span> <span class="fu">map</span> try</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  [ <span class="st">&quot;- &quot;</span> <span class="op">--&gt;</span> <span class="st">&quot; X &quot;</span> <span class="op">&lt;*</span> enemy <span class="co">-- Destroy an enemy with a laser one space away</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  , (<span class="op">:</span><span class="st">&quot; &quot;</span>) <span class="op">&lt;$&gt;</span> (string <span class="st">&quot; &quot;</span> <span class="op">*&gt;</span> enemy) <span class="co">-- Move an enemy left if it can be</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>  , <span class="st">&quot;-&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot; X&quot;</span> <span class="op">&lt;*</span> enemy <span class="co">-- Destroy an enemy with a laser in front of it</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>  , <span class="st">&quot;&gt;&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot;X &quot;</span> <span class="op">&lt;*</span> enemy <span class="co">-- Destroy the player by collision with an enemy</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  , enemy <span class="op">$&gt;</span> <span class="st">&quot; &quot;</span> <span class="co">-- Otherwise, the enemy is at the end of the screen, destroy it</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  , <span class="st">&quot;-&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot; -&quot;</span> <span class="op">&lt;*</span> anyChar <span class="co">-- Move a laser right</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>  , (<span class="op">:</span>[]) <span class="op">&lt;$&gt;</span> anyChar <span class="co">-- Leave any other character as is</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>  ]</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="co">-- Renamed: v</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="ot">vertical ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>vertical <span class="ch">'s'</span> <span class="ot">=</span> <span class="st">&quot;&gt; &quot;</span> <span class="op">--&gt;</span> <span class="st">&quot; &gt;&quot;</span> <span class="op">#</span> vertical <span class="co">-- Move the player down</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>vertical <span class="ch">'w'</span> <span class="ot">=</span> <span class="st">&quot; &gt;&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot;&gt; &quot;</span> <span class="op">#</span> vertical <span class="co">-- Move the player ul</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>vertical _ <span class="ot">=</span> asum <span class="op">$</span> <span class="fu">map</span> try</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>  [ <span class="st">&quot;X&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot; &quot;</span> <span class="co">-- Disipate an explosion</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>  , <span class="st">&quot;/&gt;&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot; X&quot;</span> <span class="co">-- Destroy the player by collision with a downward enemy</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>  , <span class="st">&quot;/&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot; /&quot;</span> <span class="op">&lt;*</span> anyChar <span class="co">-- Move a downward enemy down</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>  , <span class="st">&quot;/&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot;\\&quot;</span> <span class="op">&lt;*</span> eof <span class="co">-- Bounce a downward enemy off the bottom of the screen</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>  , <span class="st">&quot;&gt;\\&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot;X &quot;</span> <span class="co">-- Destroy the player by collision with an upward enemy</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>  , anyChar <span class="op">*&gt;</span> <span class="st">&quot;\\&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot;\\ &quot;</span> <span class="co">-- Move an upward enemy up</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>  , <span class="st">&quot;\\&quot;</span> <span class="op">--&gt;</span> <span class="st">&quot;/&quot;</span> <span class="co">-- Bounce an upward enemy off the top of the screen</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>  , (<span class="op">:</span>[]) <span class="op">&lt;$&gt;</span> anyChar <span class="co">-- Leave any other character as is</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>  ]</span></code></pre></div>
+</div>
+<h2 id="whats-next">What’s Next?</h2>
+<p>I really enjoyed how declarative this approach is and I definitely want to explore it further. But there are some questions that need to be answered before this is used in a more serious game.</p>
+<p>Is there a way to better handle vertical and horizontal rules together? It would be nice to separate out unrelated rules and combine related rules. For example, grouping all the rules for player movement together. It may be enough to just have a product type of two parsers and some combinators to work with that type.</p>
+<p>How should non-local mechanics work? In my tiny game, for example, the scorekeeping is handled by counting the number of explosions (<code>X</code>s) each frame. This could be handled fine by stateful parsers, and likewise for the randomization. But what about more complicated non-local mechanics like line of sight, fog of war, level generation, or path finding? What I’d love to see is something logic programming-ish to match the declarative-nes of the local rules, though I’m not exactly sure what that would look like.</p>
+<p>Another thing to consider is performance. It shouldn’t matter much as long as the parser is only scanning the small visible area, but it’d be nice to be able to handle simulation of a large game world. The use case is specific enough that a purpose-built library should easily be able to beat out a general-purpose parsing library.</p>
+<p>At some point, I’m planning on creating a roguelike using this method, and maybe abstracting out the common bits into a library, but at the moment I’m a bit busy with school so that will probably have to wait.</p>
+</div>
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

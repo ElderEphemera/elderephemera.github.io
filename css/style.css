@@ -1,0 +1,270 @@
+
+body
+{
+  max-width        : 925px;
+  margin           : auto auto auto auto;
+  color            : #faede8;
+  background-color : #07211e;
+  font-family      : "Fira Sans", sans-serif;
+  font-size        : 13pt;
+}
+
+a,
+a:visited
+{
+  color           : #f94c39;
+  text-decoration : none;
+}
+
+a:hover,
+a:focus
+{
+  color : #a83614;
+}
+
+
+#header a,
+#footer a
+{
+  color : #c92c29;
+}
+
+
+#navigation a:hover,
+#footer a:hover
+{
+  color : #96161b;
+}
+
+#header
+{
+  padding         : 12px 10px 3px 10px;
+  margin          : 0px 10px 0px 10px;
+  border-bottom   : 2px solid #c92c29;
+  display         : flex;
+  flex-wrap       : wrap;
+  justify-content : space-between;
+  font-weight     : bold;
+}
+
+#logo
+{
+  flex      : 1 1 auto;
+  font-size : 20pt;
+}
+
+#navigation
+{
+  flex           : 1 1 auto;
+  text-align     : right;
+  align-self     : flex-end;
+  text-transform : uppercase;
+}
+
+#content
+{
+  background-color : #081914;
+  padding          : 5px 20px 5px 20px;
+  margin           : 20px 15px 0px 15px;
+  border-radius    : 20px 20px 20px 20px;
+}
+
+div.sourceCode
+{
+  padding                 : 15px 15px 15px 15px;
+  border-style            : solid;
+  border-width            : 0px 0px 3px 3px;
+  border-color            : #0d4943;
+  border-top-right-radius : 15px 15px;
+  background-color        : #092b27 !important;
+}
+
+div.sourceCode code
+{
+  padding : 0px 0px 0px 0px;
+}
+
+pre.wrap-code > code.sourceCode
+{
+  white-space : break-spaces;
+  line-break  : anywhere;
+}
+
+code
+{
+  padding          : 1px 5px 1px 5px;
+  background-color : #092b27;
+}
+
+.collapsable
+{
+  position : relative;
+}
+
+.collapsable input[type='checkbox']:checked ~ .sourceCode
+{
+  max-height           : 64px;
+  overflow-y           : clip;
+  overflow-clip-margin : 15px;
+}
+
+.collapsable > .sourceCode
+{
+  position : relative;
+}
+
+.collapsable > .sourceCode::before
+{
+  content   : "\00a0\00a0";
+  float     : right;
+  font-size : 90%;
+}
+
+.collapsable input[type='checkbox']
+{
+  position           : absolute;
+  z-index            : 1;
+  top                : 12px;
+  right              : 12px;
+  -webkit-appearance : none;
+  -moz-appearance    : none;
+  -ms-appearance     : none;
+  -o-appearance      : none;
+  appearance         : none;
+  background-color   : #081914;
+  margin             : 0px 0px 0px 0px;
+  font               : inherit;
+  color              : #081914;
+  width              : 1.5em;
+  height             : 1.5em;
+  border-radius      : 0.75em 0.75em 0.75em 0.75em;
+  border             : 0.2em solid #092b27;
+  -webkit-transform  : translate(10px,-9px);
+  -moz-transform     : translate(10px,-9px);
+  -ms-transform      : translate(10px,-9px);
+  -o-transform       : translate(10px,-9px);
+  transform          : translate(10px,-9px);
+  display            : grid;
+  place-content      : center;
+}
+
+.collapsable input[type='checkbox']:checked::before
+{
+  content            : "";
+  width              : 0.69999em;
+  height             : 0.69999em;
+  border-radius      : 0.34999em 0.34999em 0.34999em 0.34999em;
+  -webkit-box-shadow : inset 1em 1em #a83614;
+  -moz-box-shadow    : inset 1em 1em #a83614;
+  -ms-box-shadow     : inset 1em 1em #a83614;
+  -o-box-shadow      : inset 1em 1em #a83614;
+  box-shadow         : inset 1em 1em #a83614;
+}
+
+.math > p
+{
+  overflow : auto;
+}
+
+svg
+{
+  -webkit-filter : invert(100%);
+  -moz-filter    : invert(100%);
+  -ms-filter     : invert(100%);
+  -o-filter      : invert(100%);
+  filter         : invert(100%);
+}
+
+#postlist
+{
+  list-style-type : none;
+  padding         : 0px 8px 0px 8px;
+}
+
+#postlist li
+{
+  border-top      : 1px solid #faede8;
+  padding         : 10px 10px 10px 10px;
+  display         : flex;
+  flex-wrap       : wrap;
+  justify-content : space-between;
+}
+
+#postlist li:last-child
+{
+  border-bottom : 1px solid #faede8;
+}
+
+#postlist li a
+{
+  flex : 1 1 auto;
+}
+
+#postlist li span
+{
+  color      : #756e63;
+  flex       : 0 0 auto;
+  text-align : right;
+}
+
+#projectlist
+{
+  list-style-type : none;
+  margin          : 0px 0px 0px 0px;
+  padding         : 0px 10px 15px 10px;
+}
+
+#projectlist li
+{
+  background-color : #202522;
+  border-radius    : 15px 15px 15px 15px;
+  margin-top       : 20px;
+}
+
+#projectlist li .project-header
+{
+  display          : flex;
+  flex-wrap        : wrap;
+  justify-content  : space-between;
+  background-color : #27322d;
+  padding          : 0px 13px 15px 23px;
+  border-radius    : 15px 15px 0px 0px;
+}
+
+#projectlist li .project-header .project-name
+{
+  margin    : 20px 0px 0px 0px;
+  flex      : 1 1 auto;
+  font-size : 30px;
+}
+
+#projectlist li .project-header .project-badges
+{
+  flex       : 1 1 auto;
+  text-align : right;
+  align-self : flex-end;
+}
+
+#projectlist li .project-header .project-badges a
+{
+  padding-right : 8px;
+}
+
+#projectlist li .project-description
+{
+  padding : 6px 23px 18px 23px;
+}
+
+#footer
+{
+  background-color : #202a28;
+  font-size        : 10pt;
+  border-radius    : 20px 20px 20px 20px;
+  width            : 240px;
+  padding          : 5px 0px 5px 0px;
+  margin           : 10px auto 10px auto;
+  text-align       : center;
+}
+
+
+/* Generated with Clay, http://fvisser.nl/clay */
