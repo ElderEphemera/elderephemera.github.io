@@ -188,7 +188,7 @@ jsonCtx = Context $ \name _ (Item _ meta) ->
     object key value = Object $ "key" .= key <> "value" .= value 
 
     splitName ('.':cs) = "" : splitName cs
-    splitName (c:cs) = let n:ns = splitName cs in (c:n):ns
-    splitName [] = [""]
+    splitName (c:cs) | n:ns <- splitName cs = (c:n):ns
+    splitName _ = [""]
 
     failure json = noResult $ "Tried JSON context " ++ BS.unpack (encode json)
