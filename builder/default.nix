@@ -1,4 +1,5 @@
 { pkgs ? import ../nix/pinned-nixpkgs.nix
+, skipLatex ? false
 }:
 
 (pkgs.haskellPackages.developPackage {
@@ -18,6 +19,8 @@
     latex-svg-pandoc = markUnbroken (doJailbreak super.latex-svg-pandoc);
     latex-svg-image = markUnbroken (doJailbreak super.latex-svg-image);
   };
+
+  cabal2nixOptions = if skipLatex then "-fskip-latex" else "";
 
 }).overrideAttrs (old: {
   LOCALE_ARCHIVE = "${pkgs.glibcLocales}/lib/locale/locale-archive";

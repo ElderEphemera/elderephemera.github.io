@@ -2,12 +2,13 @@
 , checkAll ? true
 , checkLinks ? checkAll
 , checkNoDrafts ? checkAll
+, skipLatex ? false
 }:
 
 let
   inherit (pkgs.lib.lists) optional;
 
-  builder = import ./builder { inherit pkgs; };
+  builder = import ./builder { inherit pkgs skipLatex; };
   projects = import ./projects { inherit pkgs; };
 
   source = pkgs.stdenv.mkDerivation {

@@ -4,6 +4,9 @@ site:
 test:
 	nix-build -A site --arg checkNoDrafts false
 
+quick:
+	nix-build -A site --arg checkAll false --arg skipLatex true
+
 ghcid:
 	nix-shell builder --run "cd builder; ghcid -c 'cabal repl'"
 

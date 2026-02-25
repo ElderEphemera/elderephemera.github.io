@@ -6,6 +6,11 @@ license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 
+flag skip-latex
+  description: Skip LaTeX rendering
+  manual: True
+  default: False
+
 executable build-site
   main-is: Main.hs
   other-modules: Style
@@ -26,3 +31,5 @@ executable build-site
   default-language: Haskell2010
   default-extensions: OverloadedStrings ImportQualifiedPost
   ghc-options: -Wall
+  if flag(skip-latex)
+    ghc-options: -DSKIP_LATEX -Wno-unused-imports

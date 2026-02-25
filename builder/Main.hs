@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE CPP, LambdaCase #-}
 
 module Main (main) where
 
@@ -118,6 +118,9 @@ pandocCompiler' processLatex = do
     $ processLatex . collapsableCodeBlocks
 
 initLatexCompiler :: IO (Pandoc -> Compiler Pandoc)
+#ifdef SKIP_LATEX
+initLatexCompiler = pure pure
+#else
 initLatexCompiler = do
   formulaComp <- initFormulaCompilerSVG 1000 envOptions
   pure $ formulaComp formulaOptions . walk wrapBlock
@@ -133,6 +136,7 @@ initLatexCompiler = do
 
     wrapBlock math@(Para [Math DisplayMath _]) = Div ("", ["math"], []) [math]
     wrapBlock other = other
+#endif
 
 collapsableCodeBlocks :: Pandoc -> Pandoc
 collapsableCodeBlocks = walk $ \case
