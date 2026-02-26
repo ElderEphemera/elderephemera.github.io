@@ -3,13 +3,17 @@
 , checkLinks ? checkAll
 , checkNoDrafts ? checkAll
 , skipLatex ? false
+, omitProjects ? false
 }:
 
 let
   inherit (pkgs.lib.lists) optional;
 
   builder = import ./builder { inherit pkgs skipLatex; };
-  projects = import ./projects { inherit pkgs; };
+  projects =
+    if omitProjects
+    then pkgs.linkFarm "elderephemera.github.io/projects" []
+    else import ./projects { inherit pkgs; };
 
   source = pkgs.stdenv.mkDerivation {
     name = "elderephemera.github.io-source";

@@ -5,7 +5,7 @@ test:
 	nix-build -A site --arg checkNoDrafts false
 
 quick:
-	nix-build -A site --arg checkAll false --arg skipLatex true
+	nix-build -A site --arg checkAll false --arg skipLatex true --arg omitProjects true
 
 ghcid:
 	nix-shell builder --run "cd builder; ghcid -c 'cabal repl'"
