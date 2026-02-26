@@ -68,7 +68,9 @@ css = do
     borderTopRightRadius (px 15) (px 15)
     important $ backgroundColor "#092b27"
 
-    code ? sym padding (px 0)
+    code ? do
+      sym padding (px 0)
+      fontFamily ["DejaVu Sans Mono"] [monospace]
 
   pre#".wrap-code" |> code#".sourceCode" ? do
     whiteSpace $ other "break-spaces"
