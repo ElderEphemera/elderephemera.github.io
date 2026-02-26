@@ -2,7 +2,7 @@
 
 module Style (Style.style) where
 
-import Prelude hiding (div, span)
+import Prelude hiding (div, not, span)
 
 import Clay
 import Clay.Flexbox qualified as F
@@ -60,7 +60,7 @@ css = do
     margin (px 20) (px 15) (px 0) (px 15)
     sym borderRadius (px 20)
 
-  div # ".sourceCode" ? do
+  div # ".sourceCode" <> pre # not ".sourceCode" ? do
     sym padding (px 15)
     borderStyle solid
     borderWidth4 (px 0) (px 0) (px 3) (px 3)
@@ -72,23 +72,24 @@ css = do
       sym padding (px 0)
       fontFamily ["DejaVu Sans Mono"] [monospace]
 
-  pre#".wrap-code" |> code#".sourceCode" ? do
+  ".wrap-code" ? star ? do
     whiteSpace $ other "break-spaces"
     "line-break" -: "anywhere"
 
   code ? do
     sym2 padding (px 1) (px 5)
     backgroundColor "#092b27"
+    color "#FAEDE8"
+    sym borderRadius (px 5)
 
   ".collapsable" ? do
     position relative
 
-    input # ("type" @= "checkbox") # checked |~ ".sourceCode" ? do
+    input # ("type" @= "checkbox") # checked |~ star ? do
       maxHeight (px 64)
       overflowY $ other "clip"
-      "overflow-clip-margin" -: "15px"
 
-    ".sourceCode" <? do
+    star <? do
       position relative
 
       before & do
