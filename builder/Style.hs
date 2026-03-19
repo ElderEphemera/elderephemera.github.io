@@ -42,16 +42,17 @@ css = do
     display flex
     flexWrap F.wrap
     justifyContent spaceBetween
+    alignItems baseline
     fontWeight bold
 
   "#logo" ? do
     F.flex 1 1 auto
     fontSize $ pt 20
+    marginRight $ px 10
 
   "#navigation" ? do
     F.flex 1 1 auto
     textAlign $ alignSide sideRight
-    alignSelf flexEnd
     textTransform uppercase
 
   "#content" ? do
