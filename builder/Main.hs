@@ -6,7 +6,9 @@ import Data.Aeson (Value(..), eitherDecode, encode, (.=))
 import Data.Aeson.Key qualified as Key (fromString)
 import Data.Aeson.KeyMap qualified as KM (lookup)
 import Data.ByteString.Lazy.Char8 qualified as BS (unpack)
+import Data.List (sortOn)
 import Data.Maybe (fromMaybe)
+import Data.Ord (Down(Down))
 import Data.Text qualified as T (length, lines, unpack)
 import Data.Text.Lazy qualified as LT (pack)
 import GHC.Exts (toList)
@@ -74,11 +76,14 @@ main = hakyll $ do
   match "projects.html" $ do
     route   cleanRoute
     compile $ do
-      let projects = traverse (either fail pure . traverse eitherDecode)
-            =<< loadAll "projects/*/info.json"
-          projectsContext =
-               listField "projects" jsonCtx projects
-            <> defaultContext
+      let
+        projects
+          =   fmap (sortOn $ Down . prioroty . itemBody)
+          $   traverse (either fail pure . traverse eitherDecode)
+          =<< loadAll "projects/*/info.json"
+        projectsContext
+          =  listField "projects" jsonCtx projects
+          <> defaultContext
       getResourceBody
         >>= applyAsTemplate projectsContext
         >>= loadAndApplyTemplate "templates/default.html" projectsContext
@@ -192,3 +197,10 @@ jsonCtx = Context $ \name _ (Item _ meta) ->
     splitName _ = [""]
 
     failure json = noResult $ "Tried JSON context " ++ BS.unpack (encode json)
+
+--------------------------------------------------------------------------------
+
+prioroty :: Value -> Int
+prioroty (Object obj)
+  | Just (Number n) <- KM.lookup (Key.fromString "priority") obj = floor n
+prioroty _ = 0
