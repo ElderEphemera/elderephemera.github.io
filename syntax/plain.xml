@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="plain" version="1" kateversion="2.2" section="Markup">
+  <highlighting>
+    <contexts>
+      <context attribute="Normal Text" lineEndContext="#stay" name="Plain" >
+      </context>
+    </contexts>
+    <itemDatas>
+    </itemDatas>
+  </highlighting>
+</language>

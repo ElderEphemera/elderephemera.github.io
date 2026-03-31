@@ -33,7 +33,7 @@ import Style (style)
 
 main :: IO ()
 main = hakyll $ do
-  match "images/*" $ do
+  match ("images/*" .||. "fonts/*") $ do
     route   idRoute
     compile copyFileCompiler
 
