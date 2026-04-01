@@ -21,7 +21,7 @@ there:
 
 - **Figure out how all of the code works.** A few bonus points for doing it
   without running the code, a lot for no copy/pasting.
-- **Find the breaking changes.** The claim of backwards compatability isn't
+- **Find the breaking changes.** The claim of backwards compatibility isn't
   fully true. I'm aware of at least a few problems, how many can you find?
 - **Win $1000 and use the flamethrower.** You probably need to be on desktop for
   this one, sorry.
