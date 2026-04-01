@@ -410,7 +410,7 @@ Object.defineProperties(window, {
     ...skins,
     ...reveals,
     "SECRET_WINDOW": { get: () =>
-       window.open("https://github.com/ElderEphemera/elderephemera.github.io/blob/master/posts/modernizing-haskell.md?plain=1")
+       window.open("https://github.com/ElderEphemera/elderephemera.github.io/blob/master/posts/modernizing-haskell.lhs")
     }
   }),
   "TRACK0": { get: () =>
